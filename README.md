@@ -1,5 +1,7 @@
-<img src="picture_README/pic_1.png" alt="ICON BỰ">
-<h1 align="center" style="padding-top:10px;">Sepsis-Application<h1>
+<p align="center">
+    <img src="picture_README/pic_1.png" style="width:400px; height:400px;" alt="ICON BỰ">
+</p>
+<h1 align="center" style="padding-top:10px">Sepsis-Application</h1>
 <h2 align="left">About the project : <h2>
 <img src="picture_README/pic_2.png" alt="ảnh dẫn chứng">
 <h3>Sepsis software is a tool that assists doctors and healthcare professionals in managing patient records, staff records, and login accounts for the software. It also measures health parameters to provide conclusions related to sepsis.</h3>
