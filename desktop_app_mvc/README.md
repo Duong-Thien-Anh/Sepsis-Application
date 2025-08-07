@@ -1,1 +1,0 @@
-# Python Desktop App - MVC Structure
