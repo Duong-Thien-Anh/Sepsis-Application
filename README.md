@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="picture_README/pic_1.png" style="width:400px; height:400px;" alt="ICON BỰ">
+    <img src="/For_Github/picture_README/pic_1.png" style="width:400px; height:400px;" alt="ICON BỰ">
 </p>
 <h1 align="center" style="padding-top:10px">Sepsis-Application</h1>
 <h2 align="left">About the project : <h2>
