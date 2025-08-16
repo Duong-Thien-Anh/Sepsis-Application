@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from PIL import Image
 from assets.assets import AssetManager
+from controllers.SignIn_Controller import limit_username_length , setup_username_entry , setup_password_entry , hover_effect_label_forget_password
 
 # ========== CENTER DESKTOP ==========
 def center_desktop(self):
@@ -55,7 +56,6 @@ def container_fr_signin(self, outer , w=822, h=460):
 
 # ========== LAYER 1 ==========
 def layer1_fr_signin(self, container):
- 
         layer1 = ctk.CTkFrame(
             container,
             fg_color="#F7F7F5",
@@ -84,48 +84,140 @@ def layer1_fr_signin(self, container):
 def input_username_fr_signin(self,form_signin):
     username_entry = ctk.CTkEntry(
         form_signin,
-        placeholder_text="Tên đăng nhập",
         fg_color="#FFFFFF",
-        border_color="#000000",
+        text_color="#000000",
+        font=("Arial", 12),
         border_width=2,
-        corner_radius=10,
-        width=250,
+        border_color="#FFFFFF",
+        width=200,
         height=40,
     )
-    username_entry.pack(pady=(10, 0), padx=15, fill="x")
+    username_entry.pack(pady=(40, 0), padx=35, fill="x")
+    limit_username_length(username_entry, max_length=30)
+    setup_username_entry(username_entry, placeholder="Nhập tên đăng nhập")
+
+    underline_frame = ctk.CTkFrame(
+         form_signin,
+         height=2,
+         fg_color="#000000"
+    )
+    underline_frame.pack( padx=35, fill="x")
     return username_entry
 
 # ========== INPUT PASSWORD ==========
-def eye_button_fr_signin(self , form_signin):
-    eye_button = ctk.CTkButton(
-        form_signin,
-        text="👁️",
-        command=lambda: self.toggle_password_visibility()
-    )
-    eye_button.pack(side="right", padx=(0, 15))
-    return eye_button
-
 def input_password_fr_signin(self, form_signin):
-    password_frame = ctk.CTkFrame(form_signin , fg_color="transparent")
-    password_frame.pack(pady=(5, 5), padx=15, fill="x")
+    password_frame = ctk.CTkFrame(
+        form_signin,
+        fg_color="transparent"
+    )
+    password_frame.pack(pady=(10, 0), padx=35, fill="x")
 
     password_entry = ctk.CTkEntry(
-        form_signin,
+        password_frame,
         placeholder_text="Mật khẩu",
         fg_color="#FFFFFF",
-        border_color="#000000",
+        text_color="#000000",
+        font=("Arial", 12),
         border_width=2,
-        corner_radius=10,
-        width=250,
+        border_color="#FFFFFF",
+        width=170,
         height=40,
         show="*"
     )
-    password_entry.pack(side="left", fill="x", expand=True)
-    self.eye_button = eye_button_fr_signin(self, password_frame)
-    return password_entry
+    password_entry.pack(side="left" ,pady=(10, 0), fill="x" , expand=True)
 
-# ========== TOGGLE PASSWORD ==========
+    eye_button = ctk.CTkButton(
+        password_frame,
+        text="👁",
+        command=lambda: setup_password_entry(eye_button),
+        width=30,
+        height=30,
+        fg_color="white",
+        text_color="black",
+        corner_radius=5,
+        font=("Arial", 18, "bold")
+    )
+    eye_button.pack(side="right", padx=(5, 0))
+    
+    underline_frame = ctk.CTkFrame(
+        form_signin,
+        height=2,
+        fg_color="#000000",
+    )
+    underline_frame.pack( padx=35, fill="x")
+    return password_entry, eye_button
 
+# ========== BUTTON SIGN IN ==========
+def button_signin_fr_signin(self, form_signin):
+    signin_button = ctk.CTkButton(
+        form_signin,
+        text="Đăng nhập",
+        command=lambda: self.signin() if hasattr(self, 'signin') else print("Chức năng đăng nhập chưa được định nghĩa"),
+        fg_color="#66B7FF",
+        hover_color="#45a049",
+        text_color="white",
+        corner_radius=8,
+        border_color="#000000",
+        border_width=1,
+        font=("Arial", 14, "bold"),
+        width=200,
+        height=45
+    )
+    signin_button.pack(pady=(20, 0), padx=35, fill="x")
+    return signin_button
+
+# ========== BUTTON GMAIL ==========
+def button_gmail_fr_signin(self, form_signin):
+    try:
+        gmail_icon = ctk.CTkImage(
+            light_image=Image.open(AssetManager.get_image_path("Gmail_Icon")),
+            size=(20, 20)
+        )
+        gmail_button = ctk.CTkButton(
+            form_signin,
+            text="  Đăng nhập với Gmail",
+            image=gmail_icon,
+            compound="left",
+            command=lambda: self.signin() if hasattr(self, 'signin') else print("Chức năng đăng nhập chưa được định nghĩa"),
+            fg_color="#66B7FF",
+            hover_color="#45a049",
+            text_color="white",
+            corner_radius=8,
+            border_color="#000000",
+            border_width=1,
+            font=("Arial", 14, "bold"),
+            width=200,
+            height=45
+        )
+    except Exception as e:
+        gmail_button = ctk.CTkButton(
+            form_signin,
+            text="Lỗi hiển thị",
+            fg_color="#66B7FF",
+            hover_color="#45a049",
+            text_color="red",
+            corner_radius=8,
+            border_color="#000000",
+            border_width=1,
+            font=("Arial", 14),
+            width=200,
+            height=45
+        )
+
+    gmail_button.pack(pady=(10, 0), padx=35, fill="x")
+    return gmail_button
+
+# ========== FORGET PASSWORD ==========
+def forget_password_fr_signin(self, form_signin):
+    forget_password_link = ctk.CTkLabel(
+        form_signin,
+        text="Quên mật khẩu?",
+        text_color="#66B7FF",
+        font=("Arial", 12, "underline"),
+    )
+    forget_password_link.pack(pady=(5, 0), padx=35, fill="x")
+    hover_effect_label_forget_password(forget_password_link)
+    return forget_password_link
 
 # ========== LAYER 2 ==========
 def layer2_fr_signin(self,container):
@@ -141,7 +233,7 @@ def layer2_fr_signin(self,container):
         try:
             form_signin = ctk.CTkFrame(
                 layer2,
-                fg_color="#F7F7F5",
+                fg_color="#FFFFFF",
                 corner_radius=15,
                 border_color="#000000",
                 border_width=2,
@@ -152,6 +244,9 @@ def layer2_fr_signin(self,container):
             title_label.pack(pady=(25, 0))
             self.username = input_username_fr_signin(self, form_signin)
             self.password = input_password_fr_signin(self, form_signin)
+            self.signin_button = button_signin_fr_signin(self, form_signin)
+            self.gmail_button = button_gmail_fr_signin(self, form_signin)
+            self.forget_password_link = forget_password_fr_signin(self, form_signin)
 
         except Exception as e:
             signin_label = ctk.CTkLabel(

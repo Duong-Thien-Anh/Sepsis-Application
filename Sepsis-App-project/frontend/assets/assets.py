@@ -7,6 +7,7 @@ class AssetManager:
         images = {
                 #Dùng cho form đăng nhập
                 "SignIn_Pic" : BASE_DIR / "images" / "SignIn_Pic.png",
+                "Gmail_Icon" : BASE_DIR / "images" / "Gmail_Icon.png"
         }
 
         @classmethod
