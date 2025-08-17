@@ -93,7 +93,6 @@ def input_username_fr_signin(self,form_signin):
         height=40,
     )
     username_entry.pack(pady=(40, 0), padx=35, fill="x")
-    limit_username_length(username_entry, max_length=30)
     setup_username_entry(username_entry, placeholder="Nhập tên đăng nhập")
 
     underline_frame = ctk.CTkFrame(
