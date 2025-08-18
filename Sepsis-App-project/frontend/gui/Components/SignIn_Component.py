@@ -129,6 +129,7 @@ def input_password_fr_signin(self, form_signin):
         show="*"
     )
     password_entry.pack(side="left" ,pady=(10, 0), fill="x" , expand=True)
+    setup_password_entry(password_entry, placeholder="Mật khẩu")
 
 
     eye_button = ctk.CTkButton(
