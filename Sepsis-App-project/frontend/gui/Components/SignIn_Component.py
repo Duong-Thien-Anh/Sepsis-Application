@@ -113,7 +113,6 @@ def input_password_fr_signin(self, form_signin):
 
     password_entry = ctk.CTkEntry(
         password_frame,
-        placeholder_text="Mật khẩu",
         fg_color="#FFFFFF",
         text_color="#000000",
         font=("Arial", 12),
@@ -124,11 +123,12 @@ def input_password_fr_signin(self, form_signin):
         show="*"
     )
     password_entry.pack(side="left" ,pady=(10, 0), fill="x" , expand=True)
+    setup_password_entry(password_entry, placeholder="Mật khẩu")
 
     eye_button = ctk.CTkButton(
         password_frame,
         text="👁",
-        command=lambda: setup_password_entry(eye_button),
+        command=lambda: setup_password_entry(password_entry ,eye_button),
         width=30,
         height=30,
         fg_color="white",

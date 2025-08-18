@@ -56,19 +56,20 @@ def limit_password_length(entry, min_length=8, max_length=30):
         entry.configure(text_color="black")
 
 # ========== SET UP PASSWORD ==========
-def setup_password_entry(entry, placeholder="Nhập mật khẩu"):
+def setup_password_entry(entry, placeholder=None):
     entry.insert(0, placeholder)
-    entry.configure(fg_color="white", text_color="grey", show="")  # show="" để hiển thị placeholder
-    
+    entry.configure(fg_color="white", text_color="grey", show="") 
+    entry.bind("<KeyRelease>", lambda event: limit_password_length(entry, min_length=8, max_length=30)) 
+
     def on_focus_in(event):
         if entry.get() == placeholder:
             entry.delete(0, ctk.END)
-            entry.configure(text_color="black", show="*")  # ẩn mật khẩu
+            entry.configure(text_color="black", show="*") 
     
     def on_focus_out(event):
         if not entry.get():
             entry.insert(0, placeholder)
-            entry.configure(text_color="grey", show="")  # hiện placeholder
+            entry.configure(text_color="grey", show="")  
     
     entry.bind("<FocusIn>", on_focus_in)
     entry.bind("<FocusOut>", on_focus_out)
