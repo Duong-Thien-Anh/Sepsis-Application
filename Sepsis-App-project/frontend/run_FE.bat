@@ -19,6 +19,8 @@ if exist requirements.txt (
 ) else (
     echo Khong tim thay file requirements.txt, dang cai thu vien mac dinh...
     pip install customtkinter python-dotenv requests
+) else (
+    echo Khong tim thay thu vien can cai dat.
 )
 
 echo ==============================
