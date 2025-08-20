@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import tkinter as tk
 from PIL import Image
 from assets.assets import AssetManager
 from controllers.SignIn_Controller import limit_username_length , setup_username_entry , setup_password_entry , hover_effect_label_forget_password
@@ -123,7 +124,7 @@ def input_password_fr_signin(self, form_signin):
         show="*"
     )
     password_entry.pack(side="left" ,pady=(10, 0), fill="x" , expand=True)
-    setup_password_entry(password_entry, placeholder="Mật khẩu")
+
 
     eye_button = ctk.CTkButton(
         password_frame,
@@ -136,8 +137,9 @@ def input_password_fr_signin(self, form_signin):
         corner_radius=5,
         font=("Arial", 18, "bold")
     )
-    eye_button.pack(side="right", padx=(5, 0))
-    
+    eye_button.pack(side=tk.RIGHT, padx=(5, 0))
+    setup_password_entry(password_entry, placeholder="Mật khẩu", eye_button=eye_button)
+
     underline_frame = ctk.CTkFrame(
         form_signin,
         height=2,
