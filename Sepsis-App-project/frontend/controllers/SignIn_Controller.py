@@ -2,7 +2,7 @@ from tkinter import messagebox
 import customtkinter as ctk
 import tkinter as tk
 import requests    
-from services.API import load_environment 
+from services.api.config import load_environment 
 
 # ========== LIMIT USERNAME LENGTH ==========
 def validate_username_input(text):
