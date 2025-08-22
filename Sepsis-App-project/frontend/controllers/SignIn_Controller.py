@@ -2,7 +2,20 @@ from tkinter import messagebox
 import customtkinter as ctk
 import tkinter as tk
 import requests    
-from services.api.config import load_environment 
+from services.api.config import load_environment, API_URL , TIMEOUT
+
+# ========== API GETTER FUNCTIONS ==========
+def get_api_url():
+    """
+    Hàm getter để component có thể lấy API_URL
+    """
+    return API_URL
+
+def get_timeout():
+    """
+    Hàm getter để component có thể lấy TIMEOUT
+    """
+    return TIMEOUT
 
 # ========== LIMIT USERNAME LENGTH ==========
 def validate_username_input(text):
@@ -107,23 +120,20 @@ def hover_effect_label_forget_password(label):
     label.bind("<Enter>", on_enter)
     label.bind("<Leave>", on_leave)
 
-# def login(self):
-#     username = self.entry_username.get().strip()
-#     password = self.entry_password.get().strip()
+def login(username , password):
+    if not username or not password:
+        messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
+        return
 
-#     if not username or not password:
-#         messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
-#         return
+    try:
+        url = f"{API_URL}/auth/login"
+        payload = {"username": username, "password": password}
+        response = requests.post(url, json=payload)
 
-#     try:
-#         url = f"{API_URL}/login"  # endpoint backend
-#         payload = {"username": username, "password": password}
-#         response = requests.post(url, json=payload)
-
-#         if response.status_code == 200:
-#             data = response.json()
-#             messagebox.showinfo("Thành công", f"Xin chào {data.get('full_name', username)}!")
-#         else:
-#             messagebox.showerror("Lỗi đăng nhập", response.json().get("message", "Sai tài khoản hoặc mật khẩu"))
-#     except Exception as e:
-#         messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")
+        if response.status_code == 200:
+            data = response.json()
+            return f"Đăng nhập thành công! Token: {data['access_token']}"
+        else:       
+            return f"Đăng nhập thất bại: {response.json().get('detail')}"
+    except Exception as e:
+        messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")

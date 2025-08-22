@@ -2,8 +2,13 @@ import customtkinter as ctk
 import tkinter as tk
 from PIL import Image
 from assets.assets import AssetManager
-from controllers.SignIn_Controller import limit_username_length , setup_username_entry , setup_password_entry , hover_effect_label_forget_password
+from controllers.SignIn_Controller import limit_username_length , setup_username_entry , setup_password_entry , hover_effect_label_forget_password , login, get_api_url ,get_timeout
 
+def some_function_in_component():
+    api_url = get_api_url()
+    timeout = get_timeout()
+    print(f"Using API: {api_url} with timeout: {timeout}")
+    
 # ========== CENTER DESKTOP ==========
 def center_desktop(self):
         screen_width = self.winfo_screenwidth()
@@ -153,7 +158,7 @@ def button_signin_fr_signin(self, form_signin):
     signin_button = ctk.CTkButton(
         form_signin,
         text="Đăng nhập",
-        command=lambda: self.signin() if hasattr(self, 'signin') else print("Chức năng đăng nhập chưa được định nghĩa"),
+        command=lambda: handle_signin_click(self),
         fg_color="#66B7FF",
         hover_color="#45a049",
         text_color="white",
@@ -166,6 +171,34 @@ def button_signin_fr_signin(self, form_signin):
     )
     signin_button.pack(pady=(20, 0), padx=35, fill="x")
     return signin_button
+
+def handle_signin_click(self):
+    username = ""
+    if hasattr(self, 'username'):
+        if isinstance(self.username, tuple):
+            username = self.username[0].get()
+        else:
+            username = self.username.get()
+    
+    password = ""
+    if hasattr(self, 'password'):
+        if isinstance(self.password, tuple):
+            password = self.password[0].get()
+        else:
+            password = self.password.get()
+    
+    if username == "Nhập tên đăng nhập":
+        username = ""
+    if password == "Mật khẩu":
+        password = ""
+    
+    result = login(username.strip(), password.strip())
+    
+    if result:
+        print(f"Kết quả đăng nhập: {result}")
+        # Có thể thêm logic chuyển trang ở đây
+        # self.destroy()  # Đóng cửa sổ đăng nhập
+        # open_main_window()  # Mở cửa sổ chính
 
 # ========== BUTTON GMAIL ==========
 def button_gmail_fr_signin(self, form_signin):
