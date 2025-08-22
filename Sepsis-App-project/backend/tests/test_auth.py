@@ -7,7 +7,7 @@ app = FastAPI()
 
 # Dữ liệu mẫu để kiểm tra đăng nhập
 fake_users_db = {
-    "admin": "123456"
+    "admin": "12345678"
 }
 
 # Schema cho request body
