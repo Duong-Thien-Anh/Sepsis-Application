@@ -2,7 +2,7 @@ import os
 from flask import request, jsonify, session, Blueprint, current_app, redirect, url_for
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
-from models import db, bcrypt, User # Import các đối tượng từ models.py
+from app.models.models import db, bcrypt, User # Import các đối tượng từ models.py
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 from authlib.integrations.flask_client import OAuth
