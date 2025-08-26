@@ -4,7 +4,7 @@ import sys # Thêm import sys để sử dụng sys.stdout
 
 from flask import Flask, redirect, url_for, session
 from dotenv import load_dotenv
-from models import db, bcrypt # Import db và bcrypt từ models.py
+from app.models.models import db, bcrypt # Import db và bcrypt từ models.py
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -87,24 +87,28 @@ def create_app():
         name='google',
         client_id=os.getenv('GOOGLE_CLIENT_ID'),
         client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-        authorize_url='https://accounts.google.com/o/oauth2/auth',
+        authorize_url='https://accounts.google.com/o/oaut   h2/auth',
         access_token_url='https://accounts.google.com/o/oauth2/token',
         api_base_url='https://www.googleapis.com/oauth2/v1/',
         client_kwargs={'scope': 'openid profile email'},
     )
     
     # --- Đăng ký Blueprint ---
-    # Import blueprint bên trong hàm factory để tránh lỗi import vòng tròn.
-    # Khi auth.routes được import, nó sẽ truy cập 'oauth' đã được 'init_app' thành công.
-    from auth.routes import auth_bp
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    with app.app_context():
+        # --- Thay đổi 2: Đăng ký Blueprint theo cấu trúc mới ---
+        # Xóa bỏ: from auth.auth__register import auth_bp
+        # Xóa bỏ: app.register_blueprint(auth_bp, url_prefix='/api/auth')
+        # Thay bằng cơ chế đăng ký tập trung:
+        from app.routes import register_routes
+        register_routes(app)
 
-    # Home route (ví dụ)
     @app.route('/')
     def index():
-        return "Backend is running!"
+        return "Backend SepsIS+ is running!"
 
     return app
+
+app = create_app()
 
 if __name__ == '__main__':
     app = create_app() # Gọi hàm factory để tạo instance app

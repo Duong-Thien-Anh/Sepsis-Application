@@ -31,7 +31,21 @@ class User(db.Model, TimestampMixin):
 
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     is_admin  = db.Column(db.Boolean, nullable=False, default=False)
-
+    
+    # SỬA LỖI: Thêm lại hàm to_dict() bị thiếu
+      # SỬA LỖI: Căn lề chính xác cho hàm to_dict()
+    def to_dict(self):
+        """Chuyển đổi object User thành dictionary để trả về JSON."""
+        return {
+            'id': self.id,
+            'email': self.email,
+            'name': self.name,
+            'profile_picture': self.profile_picture,
+            'is_active': self.is_active,
+            'is_admin': self.is_admin,
+            'created_at': self.created_at.isoformat()
+        }
+    
     # Set password (used for email/password authentication)
     def set_password(self, raw_password: str) -> None:
         self.password_hash = bcrypt.generate_password_hash(raw_password).decode("utf-8")
