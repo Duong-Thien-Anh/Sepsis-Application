@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 def _create_jwt_token(user):
     # Thêm "camera giám sát" để kiểm tra
-    print("--- DEBUG: CREATING TOKEN WITH IDENTITY (user.id) ---")
+    print("--- DEBUG: CREATING TOKEN WITH NEW LOGIC (user.id) ---")
     
     # Sửa lỗi: identity phải là một giá trị đơn giản (như ID)
     identity = user.id

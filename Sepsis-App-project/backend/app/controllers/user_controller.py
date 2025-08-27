@@ -4,6 +4,9 @@ from app.services import user_service
 from app.models.models import User
 
 def get_users():
+    # Thêm "camera giám sát" để kiểm tra
+    print("--- DEBUG: ADMIN ACCESS GRANTED, EXECUTING get_users ---")
+    
     search_term = request.args.get('search')
     users = user_service.get_all_users(search_term)
     return jsonify([user.to_dict() for user in users]), 200
