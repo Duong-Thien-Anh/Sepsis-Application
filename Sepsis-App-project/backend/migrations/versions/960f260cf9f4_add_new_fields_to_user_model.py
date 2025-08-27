@@ -1,8 +1,8 @@
-"""Create initial tables
+"""Add new fields to User model
 
-Revision ID: 6fff99a62d5f
+Revision ID: 960f260cf9f4
 Revises: 
-Create Date: 2025-08-26 16:13:49.021319
+Create Date: 2025-08-27 13:37:22.495721
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6fff99a62d5f'
+revision = '960f260cf9f4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,10 +27,13 @@ def upgrade():
     sa.Column('profile_picture', sa.String(length=255), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('is_admin', sa.Boolean(), nullable=False),
+    sa.Column('username', sa.String(length=80), nullable=False),
+    sa.Column('phone', sa.String(length=20), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_users')),
-    sa.UniqueConstraint('google_id', name=op.f('uq_users_google_id'))
+    sa.UniqueConstraint('google_id', name=op.f('uq_users_google_id')),
+    sa.UniqueConstraint('username', name=op.f('uq_users_username'))
     )
     with op.batch_alter_table('users', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_users_email'), ['email'], unique=True)

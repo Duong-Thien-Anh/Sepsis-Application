@@ -1,9 +1,9 @@
 # backend/app/controllers/auth_controller.py
-from flask import request, jsonify, url_for, current_app
+from flask import request, jsonify, url_for, session
+from app.extensions import oauth
 from app.services import auth_service
 from app.models.models import User
 from flask_jwt_extended import get_jwt_identity
-from main import oauth
 
 def register():
     user, message, status_code = auth_service.register_user(request.get_json())
@@ -16,15 +16,15 @@ def login():
     return jsonify(access_token=token, message=message), status_code
 
 def google_login():
-    
     redirect_uri = url_for('auth.google_callback', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
 def google_callback():
-   
     try:
         token_data = oauth.google.authorize_access_token()
-        userinfo = oauth.google.parse_id_token(token_data)
+        nonce = session.get('nonce')
+        userinfo = oauth.google.parse_id_token(token_data, nonce=nonce)
+        
         access_token, message, status_code = auth_service.process_google_login(userinfo)
         return jsonify(access_token=access_token, message=message), status_code
     except Exception as e:

@@ -1,57 +1,76 @@
 # backend/app/services/auth_service.py
-from app.models.models import db, User
+from app.models.models import User
+from app.extensions import db
 from flask_jwt_extended import create_access_token
 from sqlalchemy.exc import IntegrityError
 
 def _create_jwt_token(user):
-    identity = {"id": user.id, "email": user.email, "is_admin": user.is_admin}
-    return create_access_token(identity=identity)
+    # Thêm "camera giám sát" để kiểm tra
+    print("--- DEBUG: CREATING TOKEN WITH IDENTITY (user.id) ---")
+    
+    # Sửa lỗi: identity phải là một giá trị đơn giản (như ID)
+    identity = user.id
+    # Sửa lỗi: Thông tin phụ được đưa vào additional_claims
+    additional_claims = {"role": user.role, "username": user.username}
+    return create_access_token(identity=identity, additional_claims=additional_claims)
 
 def register_user(data):
+    username = data.get('username')
     email = (data.get('email') or '').strip().lower()
-    password = (data.get('password') or '').strip()
+    password = data.get('password')
 
-    if not email or not password: return None, "Yêu cầu email và mật khẩu.", 400
-    if len(password) < 6: return None, "Mật khẩu phải có ít nhất 6 ký tự.", 400
-    
-    try:
-        new_user = User(email=email)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        db.session.commit()
-        return new_user, "Đăng ký thành công.", 201
-    except IntegrityError:
-        db.session.rollback()
+    if not all([username, email, password]):
+        return None, "Tài khoản, email và mật khẩu là bắt buộc.", 400
+    if User.query.filter_by(username=username).first():
+        return None, "Tài khoản đã tồn tại.", 409
+    if User.query.filter_by(email=email).first():
         return None, "Email đã tồn tại.", 409
+    
+    new_user = User(
+        username=username,
+        email=email,
+        name=data.get('name'),
+        phone=data.get('phone'),
+        role=data.get('role', 'Staff')
+    )
+    new_user.set_password(password)
+    db.session.add(new_user)
+    db.session.commit()
+    return new_user, "Đăng ký thành công.", 201
 
 def login_user(data):
-    email = (data.get('email') or '').strip().lower()
-    password = (data.get('password') or '').strip()
-    user = User.query.filter_by(email=email).first()
+    # Cập nhật: Đăng nhập bằng username
+    username = data.get('username')
+    password = data.get('password')
+    user = User.query.filter_by(username=username).first()
 
     if user and user.check_password(password):
         if not user.is_active: return None, "Tài khoản đã bị vô hiệu hóa.", 403
         access_token = _create_jwt_token(user)
         return access_token, "Đăng nhập thành công.", 200
     
-    return None, "Sai email hoặc mật khẩu.", 401
+    return None, "Sai tài khoản hoặc mật khẩu.", 401
 
 def process_google_login(userinfo):
-    google_id = userinfo['sub']
+    """
+    Xử lý đăng nhập Google. Chỉ cho phép đăng nhập nếu email đã tồn tại.
+    """
     email = userinfo['email']
-    user = User.query.filter((User.google_id == google_id) | (User.email == email)).first()
+    
+    # Bước 1: Tìm người dùng bằng email
+    user = User.query.filter_by(email=email).first()
 
-    if user:
-        user.google_id = google_id
-        user.name = userinfo.get('name')
-        user.profile_picture = userinfo.get('picture')
-    else:
-        user = User(
-            google_id=google_id, email=email,
-            name=userinfo.get('name'), profile_picture=userinfo.get('picture')
-        )
-        db.session.add(user)
+    # Bước 2: Nếu không tìm thấy, trả về lỗi
+    if not user:
+        return None, "Tài khoản của bạn không tồn tại trong hệ thống.", 403 # Forbidden
+
+    # Bước 3: Nếu tìm thấy, liên kết tài khoản và cập nhật thông tin
+    user.google_id = userinfo['sub'] # Liên kết Google ID
+    user.name = userinfo.get('name', user.name)
+    user.profile_picture = userinfo.get('picture', user.profile_picture)
     
     db.session.commit()
+    
+    # Bước 4: Tạo token và trả về
     access_token = _create_jwt_token(user)
     return access_token, "Đăng nhập với Google thành công.", 200

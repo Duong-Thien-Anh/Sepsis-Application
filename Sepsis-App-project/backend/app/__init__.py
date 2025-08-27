@@ -1,20 +1,31 @@
 # backend/app/__init__.py
 import os
+import logging
+import sys
 from flask import Flask
-from dotenv import load_dotenv
-# Sửa lỗi: Import từ extensions.py
 from .extensions import db, bcrypt, migrate, jwt, oauth
 
-load_dotenv()
+def setup_logging():
+    """Cấu hình logging chi tiết cho ứng dụng."""
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    root_logger = logging.getLogger()
+    root_logger.addHandler(handler)
+    root_logger.setLevel(logging.DEBUG)
 
 def create_app():
     """Hàm factory để tạo và cấu hình ứng dụng Flask."""
+    setup_logging() # Gọi hàm cấu hình logging
+    
     app = Flask(__name__, instance_relative_config=True)
     os.makedirs(app.instance_path, exist_ok=True)
 
     # Cấu hình ứng dụng
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+    # SỬA LỖI: Dùng chung JWT_SECRET_KEY cho cả SECRET_KEY
+    jwt_secret = os.getenv('JWT_SECRET_KEY')
+    app.config['SECRET_KEY'] = jwt_secret
+    app.config['JWT_SECRET_KEY'] = jwt_secret
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
