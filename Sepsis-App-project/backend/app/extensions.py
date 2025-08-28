@@ -6,6 +6,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from authlib.integrations.flask_client import OAuth
 from sqlalchemy import MetaData
+from flask_mail import Mail
 
 # Sửa lỗi: Thêm quy tắc đặt tên cho constraint
 naming_convention = {
@@ -22,3 +23,4 @@ bcrypt = Bcrypt()
 migrate = Migrate()
 jwt = JWTManager()
 oauth = OAuth()
+mail = Mail()
