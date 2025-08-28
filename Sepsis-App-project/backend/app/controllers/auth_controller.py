@@ -1,9 +1,11 @@
 # backend/app/controllers/auth_controller.py
-from flask import request, jsonify, url_for, session
+from flask import request, jsonify, url_for, session, current_app
 from app.extensions import oauth
+from flask_mail import Message
 from app.services import auth_service
 from app.models.models import User
 from flask_jwt_extended import get_jwt_identity
+import logging
 
 def register():
     user, message, status_code = auth_service.register_user(request.get_json())
@@ -36,3 +38,25 @@ def get_me():
     user_id = int(current_user_id_str)
     user = User.query.get_or_404(user_id)
     return jsonify(user.to_dict()), 200
+
+def forgot_password_controller():
+    success, email_data, status_code = auth_service.forgot_password(request.get_json())
+    
+    if email_data:
+        try:
+            mail = current_app.extensions.get('mail')
+            
+            msg = Message(**email_data)
+            mail.send(msg)
+            logging.info(f"Password reset email sent to {email_data['recipients'][0]}")
+        except Exception as e:
+            logging.error(f"EMAIL SENDING FAILED: {e}", exc_info=True)
+            return jsonify({"message": "Lỗi máy chủ khi gửi email."}), 500
+
+    return jsonify({"message": "Nếu email của bạn tồn tại trong hệ thống, một email đặt lại mật khẩu đã được gửi."}), status_code
+
+def reset_password_controller():
+    success, message, status_code = auth_service.reset_password(request.get_json())
+    if not success:
+        return jsonify({"message": message}), status_code
+    return jsonify({"message": message}), status_code

@@ -3,7 +3,7 @@ import os
 import logging
 import sys
 from flask import Flask
-from .extensions import db, bcrypt, migrate, jwt, oauth
+from .extensions import db, bcrypt, migrate, jwt, oauth, mail
 from datetime import timedelta
 
 def setup_logging():
@@ -32,13 +32,22 @@ def create_app():
 
     # Cập nhật: Kéo dài thời gian hết hạn của token
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1) # Mặc định là 15 phút
+    
+    # Cấu hình Flask-Mail
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() in ['true', '1', 't']
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', os.getenv('MAIL_USERNAME'))
+
     # Liên kết các extensions với app
     db.init_app(app)
     bcrypt.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
     oauth.init_app(app)
-
+    mail.init_app(app)
     # Đăng ký Google OAuth client
     oauth.register(
         name='google',
