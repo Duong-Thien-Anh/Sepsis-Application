@@ -7,8 +7,8 @@ def get_users():
     # Thêm "camera giám sát" để kiểm tra
     print("--- DEBUG: ADMIN ACCESS GRANTED, EXECUTING get_users ---")
     
-    search_term = request.args.get('search')
-    users = user_service.get_all_users(search_term)
+  
+    users = user_service.get_all_users(request.args)
     return jsonify([user.to_dict() for user in users]), 200
 
 def update_user(user_id):

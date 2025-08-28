@@ -31,6 +31,8 @@ def google_callback():
         return jsonify({"message": "Đăng nhập Google thất bại", "error": str(e)}), 400
 
 def get_me():
-    user_id = get_jwt_identity()['id']
+    # Sửa lỗi: Chuyển identity từ string về lại int để query
+    current_user_id_str = get_jwt_identity()
+    user_id = int(current_user_id_str)
     user = User.query.get_or_404(user_id)
     return jsonify(user.to_dict()), 200

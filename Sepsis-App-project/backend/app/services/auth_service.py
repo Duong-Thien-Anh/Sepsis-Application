@@ -5,12 +5,8 @@ from flask_jwt_extended import create_access_token
 from sqlalchemy.exc import IntegrityError
 
 def _create_jwt_token(user):
-    # Thêm "camera giám sát" để kiểm tra
-    print("--- DEBUG: CREATING TOKEN WITH NEW LOGIC (user.id) ---")
-    
-    # Sửa lỗi: identity phải là một giá trị đơn giản (như ID)
-    identity = user.id
-    # Sửa lỗi: Thông tin phụ được đưa vào additional_claims
+    # Sửa lỗi: Ép kiểu identity thành string để đảm bảo tương thích
+    identity = str(user.id)
     additional_claims = {"role": user.role, "username": user.username}
     return create_access_token(identity=identity, additional_claims=additional_claims)
 

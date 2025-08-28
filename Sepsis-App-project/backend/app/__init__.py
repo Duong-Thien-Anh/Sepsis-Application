@@ -4,6 +4,7 @@ import logging
 import sys
 from flask import Flask
 from .extensions import db, bcrypt, migrate, jwt, oauth
+from datetime import timedelta
 
 def setup_logging():
     """Cấu hình logging chi tiết cho ứng dụng."""
@@ -29,6 +30,8 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    # Cập nhật: Kéo dài thời gian hết hạn của token
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1) # Mặc định là 15 phút
     # Liên kết các extensions với app
     db.init_app(app)
     bcrypt.init_app(app)
