@@ -1,7 +1,9 @@
+from ast import pattern
 from tkinter import messagebox
 import customtkinter as ctk
 import tkinter as tk
-import requests    
+import requests
+import re    
 from services.api.config import load_environment, API_URL , TIMEOUT
 
 # ========== API GETTER FUNCTIONS ==========
@@ -137,3 +139,45 @@ def login(username , password):
             return f"Đăng nhập thất bại: {response.json().get('detail')}"
     except Exception as e:
         messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")
+
+# ========== LIMIT EMAIL LENGTH ==========
+
+def validate_email_format(email: str) -> bool:
+    GMAIL_REGEX = r"^[a-zA-Z0-9._%+-]+@gmail\.com$"
+    GMAIL_REGEX = pattern
+    return re.match(pattern, email) is not None
+
+def check_email(entry, min_length=5, max_length=30):
+    text = entry.get()
+    if len(text) > max_length:
+        entry.delete(max_length, tk.END)
+        entry.configure(text_color="red")
+    elif len(text) < min_length:
+        entry.configure(text_color="red")
+    elif not validate_email_format(text):
+        entry.configure(text_color="red")
+    else:
+        entry.configure(text_color="black")
+
+
+# ========== SET UP EMAIL ==========
+def setup_email_entry(entry, placeholder="Nhập email"):
+    vcmd = (entry.register(validate_email_format), '%P')
+    entry.configure(validate='key', validatecommand=vcmd)
+
+    entry.insert(0, placeholder)
+    entry.configure(fg_color="white", text_color="grey")
+    entry.bind("<KeyRelease>", lambda event: check_email(entry, max_length=30))
+
+    def on_focus_in(event):
+        if entry.get() == placeholder:
+            entry.delete(0, ctk.END)
+            entry.configure(text_color="black")
+    
+    def on_focus_out(event):
+        if not entry.get():
+            entry.insert(0, placeholder)
+            entry.configure(text_color="grey")
+    
+    entry.bind("<FocusIn>", on_focus_in)
+    entry.bind("<FocusOut>", on_focus_out)
