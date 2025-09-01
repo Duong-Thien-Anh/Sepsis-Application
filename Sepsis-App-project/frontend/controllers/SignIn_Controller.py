@@ -3,6 +3,8 @@ import customtkinter as ctk
 import tkinter as tk
 import requests    
 from services.api.config import load_environment, API_URL , TIMEOUT
+from services.api.auth_service import AuthService
+auth_service = AuthService()
 
 # ========== API GETTER FUNCTIONS ==========
 def get_api_url():
@@ -120,20 +122,35 @@ def hover_effect_label_forget_password(label):
     label.bind("<Enter>", on_enter)
     label.bind("<Leave>", on_leave)
 
-def login(username , password):
+def login(username, password):
+    """
+    Xử lý logic đăng nhập: gọi API, lưu token và trả về True/False.
+    """
+    # 1. Kiểm tra dữ liệu đầu vào từ người dùng
     if not username or not password:
         messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
-        return
+        return False # Trả về False khi thất bại
 
+    # 2. Gọi API và xử lý kết quả
     try:
-        url = f"{API_URL}/auth/login"
-        payload = {"username": username, "password": password}
-        response = requests.post(url, json=payload)
+        # Gọi phương thức login đã được định nghĩa trong APIClient
+        result = auth_service.login(username, password)
 
-        if response.status_code == 200:
-            data = response.json()
-            return f"Đăng nhập thành công! Token: {data['access_token']}"
-        else:       
-            return f"Đăng nhập thất bại: {response.json().get('detail')}"
+        # Lấy access_token từ dữ liệu trả về
+        access_token = result.get("access_token")
+
+        if access_token:
+            # BƯỚC QUAN TRỌNG: Lưu token vào client để dùng cho các yêu cầu sau
+            auth_service.client.set_token(access_token)
+            
+            print("Đăng nhập thành công, token đã được lưu vào APIClient.")
+            return True # Trả về True khi mọi thứ thành công
+        else:
+            # Trường hợp hiếm: API không báo lỗi nhưng cũng không trả về token
+            messagebox.showerror("Lỗi Phản Hồi", "Phản hồi từ server không hợp lệ.")
+            return False
+
     except Exception as e:
-        messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")
+        # Bắt lỗi từ APIClient (ví dụ: ConnectionError) và các lỗi khác
+        messagebox.showerror("Lỗi Đăng Nhập", f"Đăng nhập thất bại.\nChi tiết: {e}")
+        return False

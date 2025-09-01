@@ -1,14 +1,14 @@
-BASE_URL = "http://localhost:8000/api/v1"
-
+BASE_URL = "http://127.0.0.1:5000"
 # -------------------------------
 # Auth APIs
 # -------------------------------
 def get_auth_urls():
     return {
-        "login": f"{BASE_URL}/auth/login",
-        "register": f"{BASE_URL}/auth/register",
-        "logout": f"{BASE_URL}/auth/logout",
-        "refresh_token": f"{BASE_URL}/auth/refresh",
+        # Thêm "/api" vào đây
+        "login": "/api/auth/login",
+        "register": "/api/auth/register",
+        "logout": "/api/auth/logout",
+        "refresh_token": "/api/auth/refresh",
     }
 
 

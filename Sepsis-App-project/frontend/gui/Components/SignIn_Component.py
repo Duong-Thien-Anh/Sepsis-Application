@@ -173,6 +173,7 @@ def button_signin_fr_signin(self, form_signin):
     return signin_button
 
 def handle_signin_click(self):
+    # --- Phần lấy username và password này giữ nguyên ---
     username = ""
     if hasattr(self, 'username'):
         if isinstance(self.username, tuple):
@@ -192,14 +193,26 @@ def handle_signin_click(self):
     if password == "Mật khẩu":
         password = ""
     
-    result = login(username.strip(), password.strip())
-    
-    if result:
-        print(f"Kết quả đăng nhập: {result}")
-        # Có thể thêm logic chuyển trang ở đây
-        # self.destroy()  # Đóng cửa sổ đăng nhập
-        # open_main_window()  # Mở cửa sổ chính
+    # --- Phần xử lý kết quả được chỉnh sửa lại ở đây ---
 
+    # Gọi hàm login và nhận về kết quả True/False
+    is_successful = login(username.strip(), password.strip())
+    
+    # Dựa vào kết quả True/False để quyết định hành động tiếp theo
+    if is_successful:
+        # Nếu đăng nhập thành công (login trả về True)
+        print("Đăng nhập thành công! Chuẩn bị chuyển trang...")
+        
+        # Tại đây bạn có thể thực hiện hành động chuyển trang,
+        # ví dụ: đóng cửa sổ đăng nhập và mở cửa sổ chính của ứng dụng.
+        # self.destroy() 
+        # open_main_window()
+        
+    else:
+        # Nếu đăng nhập thất bại (login trả về False)
+        # Hàm login trong controller đã tự hiển thị messagebox lỗi rồi,
+        # nên ở đây không cần làm gì thêm, chỉ cần in ra log để gỡ lỗi nếu cần.
+        print("Đăng nhập thất bại, người dùng đã thấy thông báo lỗi.")
 # ========== BUTTON GMAIL ==========
 def button_gmail_fr_signin(self, form_signin):
     try:

@@ -1,15 +1,16 @@
-from .api_client import ApiClient
+from .api_client import APIClient
 from .api_urls import get_auth_urls
 
 class AuthService:
     def __init__(self):
-        self.client = ApiClient()  # client chung cho toàn hệ thống
+        self.client = APIClient()  # client chung cho toàn hệ thống
         self.urls = get_auth_urls()  # load nhóm endpoint Auth
 
     def login(self, username: str, password: str):
         """Gọi API đăng nhập"""
         payload = {"username": username, "password": password}
-        return self.client.post(self.urls["login"], json=payload)
+        return self.client.request(method="POST", endpoint=self.urls["login"], json=payload)
+
 
     def register(self, username: str, password: str, email: str):
         """Gọi API đăng ký"""
