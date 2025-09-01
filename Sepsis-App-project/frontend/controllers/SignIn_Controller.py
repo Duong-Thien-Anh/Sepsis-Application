@@ -4,6 +4,9 @@ import tkinter as tk
 import requests    
 from services.api.config import load_environment, API_URL , TIMEOUT
 from services.api.auth_service import AuthService
+import webbrowser
+
+GOOGLE_LOGIN_URL = "http://127.0.0.1:5000/api/auth/google/login"
 auth_service = AuthService()
 
 # ========== API GETTER FUNCTIONS ==========
@@ -154,3 +157,13 @@ def login(username, password):
         # Bắt lỗi từ APIClient (ví dụ: ConnectionError) và các lỗi khác
         messagebox.showerror("Lỗi Đăng Nhập", f"Đăng nhập thất bại.\nChi tiết: {e}")
         return False
+
+def handle_google_signin_click():
+    """
+    Mở trình duyệt để bắt đầu quy trình đăng nhập Google.
+    """
+    print(f"Mở trình duyệt để đăng nhập Google...")
+    try:
+        webbrowser.open(GOOGLE_LOGIN_URL)
+    except Exception as e:
+        print(f"Lỗi không thể mở trình duyệt: {e}")

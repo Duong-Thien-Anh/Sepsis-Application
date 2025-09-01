@@ -3,6 +3,7 @@ import tkinter as tk
 from PIL import Image
 from assets.assets import AssetManager
 from controllers.SignIn_Controller import limit_username_length , setup_username_entry , setup_password_entry , hover_effect_label_forget_password , login, get_api_url ,get_timeout
+from controllers.SignIn_Controller import handle_google_signin_click
 
 def some_function_in_component():
     api_url = get_api_url()
@@ -225,7 +226,7 @@ def button_gmail_fr_signin(self, form_signin):
             text="  Đăng nhập với Gmail",
             image=gmail_icon,
             compound="left",
-            command=lambda: self.signin() if hasattr(self, 'signin') else print("Chức năng đăng nhập chưa được định nghĩa"),
+            command=handle_google_signin_click,
             fg_color="#66B7FF",
             hover_color="#45a049",
             text_color="white",
