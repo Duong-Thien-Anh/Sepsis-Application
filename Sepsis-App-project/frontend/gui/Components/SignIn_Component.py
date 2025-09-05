@@ -2,7 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from PIL import Image
 from assets.assets import AssetManager
-from controllers.SignIn_Controller import limit_username_length , setup_username_entry , setup_password_entry , hover_effect_label_forget_password , login, get_api_url ,get_timeout , setup_email_entry
+from controllers.SignIn_Controller import limit_username_length , setup_username_entry , setup_password_entry , hover_effect_label_forget_password , login, get_api_url ,get_timeout , setup_email_entry , on_send_code
 
 def some_function_in_component():
     api_url = get_api_url()
@@ -305,48 +305,55 @@ def input_email_fr_forgetpassword(self, form_forget_password):
         height=40,
     )
     email_entry.pack(pady=(40, 0), padx=35, fill="x")
-    setup_email_entry(email_entry, placeholder="Nhập email")
 
-    underline_frame = ctk.CTkFrame(
-         form_forget_password,
-         height=2,
-         fg_color="#000000"
+    underline_frame = ctk.CTkFrame(form_forget_password, height=2, fg_color="#000000")
+    underline_frame.pack(padx=35, fill="x")
+
+    error_label = ctk.CTkLabel(form_forget_password, text="", text_color="red", font=("Arial", 10))
+    error_label.pack(padx=35, anchor="w")
+
+    setup_email_entry(email_entry, error_label, placeholder="Nhập email")
+    # email_entry.bind("<Return>", lambda event: self.on_send_code(form_forget_password))
+    return email_entry, error_label , underline_frame
+
+# ========== BUTTON SEND CODE ==========
+def button_send_code_fr_forgetpassword(self, form_forget_password):
+    self.send_button = ctk.CTkButton(
+        form_forget_password,
+        text="Gửi mã",
+        fg_color="#007BFF",
+        hover_color="#0056b3",
+        text_color="white",
+        command=lambda: on_send_code(self, form_forget_password),
     )
-    underline_frame.pack( padx=35, fill="x")
-    return email_entry
-
+    self.send_button.pack(pady=20)
+    return self.send_button
 
 # ==========    LAYER 3      ==========
 def layer3_fr_forgetpassword(self, container):
-    layer3 = ctk.CTkFrame(
-        container,
-        fg_color="#F7F7F5",
-    )
+    layer3 = ctk.CTkFrame(container, fg_color="#F7F7F5")
     layer3.grid(row=0, column=1, sticky="nsew", padx=(0, 10), pady=10)
-    layer3.grid_propagate(False)
-    layer3.pack_propagate(False)
 
-    try:
-        form_forget_password = ctk.CTkFrame(
-            layer3,
-            fg_color="#FFFFFF",
-            corner_radius=15,
-            border_color="#000000",
-            border_width=2,
+    form_forget_password = ctk.CTkFrame(
+        layer3,
+        fg_color="#FFFFFF",
+        corner_radius=15,
+        border_color="#000000",
+        border_width=2,
+    )
+    form_forget_password.pack(expand=True, fill="both", padx=15, pady=15)
 
-        )
-        form_forget_password.pack(expand=True, fill="both", padx=15, pady=15)
-        title_label = ctk.CTkLabel(form_forget_password, text="Quên mật khẩu", font=("Arial", 30, "bold"), text_color="#000000")
-        title_label.pack(pady=(25, 0))
-        self.email = input_email_fr_forgetpassword(self, form_forget_password)
-        # self.reset_button = button_reset_fr_forgetpassword(self, form_forget_password)
+    # ---- Tiêu đề ----
+    title_label = ctk.CTkLabel(
+        form_forget_password,
+        text="Quên mật khẩu",
+        font=("Arial", 30, "bold"),
+        text_color="#000000",
+    )
+    title_label.pack(pady=(25, 0))
 
-    except Exception as e:
-        forget_password_label = ctk.CTkLabel(
-            form_forget_password,
-            text="Lỗi hiển thị",
-            font=("Arial", 12),
-            text_color="red"
-        )
-        forget_password_label.place(relx=0.5, rely=0.5, anchor="center")
+    # ---- Input email ----
+    self.email_entry, self.error_label , self.underline_frame = input_email_fr_forgetpassword(self, form_forget_password)
+    self.send_button = button_send_code_fr_forgetpassword(self, form_forget_password)
+
     return layer3

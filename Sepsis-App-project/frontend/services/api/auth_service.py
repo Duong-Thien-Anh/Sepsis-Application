@@ -15,7 +15,7 @@ class AuthService:
         """Gọi API đăng ký"""
         payload = {"username": username, "password": password, "email": email}
         return self.client.post(self.urls["register"], json=payload)
-
+ 
     def logout(self):
         """Gọi API đăng xuất"""
         return self.client.post(self.urls["logout"])

@@ -1,7 +1,16 @@
-
+# main.py
 from gui.Views.SignIn import SignInForm
-from gui.Views.ForgetPassword import ForgetPassword
+from gui.Views.ForgetPassword import ForgetPasswordForm
+
+class MainApp:
+    def __init__(self):
+        self.app = SignInForm()
+
+def run():
+    main_app = MainApp()
+    return main_app.app, main_app
 
 if __name__ == "__main__":
-    app = ForgetPassword()
-    app.mainloop()
+    root, app = run()
+    root.mainloop()
+

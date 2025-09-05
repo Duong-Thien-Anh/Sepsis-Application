@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from gui.Components.SignIn_Component import center_desktop , outer_fr_signin, container_fr_signin, layer1_fr_signin, layer2_fr_signin , layer3_fr_forgetpassword
 
-class ForgetPassword(ctk.CTk):
+class ForgetPasswordForm(ctk.CTk):
     def __init__(self):
         super().__init__()
         #setting background windows
