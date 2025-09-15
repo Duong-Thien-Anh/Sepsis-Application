@@ -4,7 +4,7 @@ from gui.Views.ForgetPassword import ForgetPasswordForm
 
 class MainApp:
     def __init__(self):
-        self.app = SignInForm()
+        self.app = ForgetPasswordForm()
 
 def run():
     main_app = MainApp()

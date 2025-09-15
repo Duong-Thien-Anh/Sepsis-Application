@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from gui.Components.SignIn_Component import center_desktop , outer_fr_signin, container_fr_signin, layer1_fr_signin, layer2_fr_signin
+from gui.Components.SignIn_Component import SignInFormUI , SignInComponent 
 
 class SignInForm(ctk.CTk):
     def __init__(self):
@@ -10,12 +10,26 @@ class SignInForm(ctk.CTk):
         self.title("Đăng nhập hệ thống")
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
- 
-        center_desktop(self)
-        outer = outer_fr_signin(self)
-        container = container_fr_signin(self, outer)
-        layer1 = layer1_fr_signin(self,container)
-        layer2 = layer2_fr_signin(self,container)
 
+        self.center_desktop()
+        self.Component = SignInComponent(self)
+        self.Component.grid(row=0, column=0, sticky="nsew")  #  Thêm grid cho frame
 
+        self.SignIn = SignInFormUI(master=self.Component)
+        self.SignIn.grid(row=0, column=0, sticky="nsew")  #  Thêm grid cho UI
 
+# ========== CENTER DESKTOP ==========
+    def center_desktop(self):
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
+        # Define width and height for centering
+        width = 862
+        height = 500
+        
+        # Calculate coordinates for centering
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        self.geometry(f"{width}x{height}+{x}+{y}")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)

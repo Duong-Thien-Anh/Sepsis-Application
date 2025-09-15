@@ -5,7 +5,7 @@ import tkinter as tk
 import requests
 import re    
 from services.api.config import load_environment, API_URL , TIMEOUT
-
+# from gui.Components.SignIn_Component import layer2_fr_signin, layer3_fr_forgetpassword
 # ========== API GETTER FUNCTIONS ==========
 def get_api_url():
     """
@@ -19,6 +19,13 @@ def get_timeout():
     """
     return TIMEOUT
 
+# class SignInController:
+#     def __init__(self):
+#         load_environment()
+#         self.api_url = get_api_url()
+#         self.timeout = get_timeout()
+#         print(f"Using API: {self.api_url} with timeout: {self.timeout}")
+        
 # ========== LIMIT USERNAME LENGTH ==========
 def validate_username_input(text):
     return len(text) <= 30
@@ -26,8 +33,8 @@ def validate_username_input(text):
 def limit_username_length(entry,min_length=0, max_length=30):
     text = entry.get()
     if len(text) > max_length:
-       entry.delete(max_length, tk.END)
-       entry.configure(text_color="red")
+        entry.delete(max_length, tk.END)
+        entry.configure(text_color="red")
     elif len(text) == min_length:
         entry.configure(text_color="red")
     else:
@@ -139,6 +146,25 @@ def login(username , password):
             return f"Đăng nhập thất bại: {response.json().get('detail')}"
     except Exception as e:
         messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")
+
+# ========== SHOW FORGET PASSWORD ==========
+# def show_signin(self):
+#     # Ẩn layer3 nếu có
+#     if self.layer3:
+#         self.layer3.grid_forget()
+
+#     if not self.layer2:
+#         self.layer2 = layer2_fr_signin(self.container, self)  # pass self = controller
+#     self.layer2.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+
+# def show_forget_password(self):
+#     # Ẩn layer2 nếu có
+#     if self.layer2:
+#         self.layer2.grid_forget()
+
+#     if not self.layer3:
+#         self.layer3 = layer3_fr_forgetpassword(self.container, self)
+#     self.layer3.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
 
 # ========== LIMIT EMAIL LENGTH ==========
 
@@ -274,10 +300,16 @@ def switch_to_code_input(self, parent):
     confirm_btn = ctk.CTkButton(
         parent,
         text="Xác nhận",
-        fg_color="#28a745",
-        hover_color="#218838",
+        fg_color="#66B7FF",
+        hover_color="#45a049",
         text_color="white",
         command=lambda: on_confirm_code(self),
+        corner_radius=8,
+        border_color="#000000",
+        border_width=1,
+        font=("Arial", 14, "bold"),
+        width=100,
+        height=45
     )
     confirm_btn.pack(pady=20)
 
