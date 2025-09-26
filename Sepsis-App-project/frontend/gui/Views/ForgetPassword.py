@@ -1,5 +1,6 @@
 import customtkinter as ctk
-from gui.Components.SignIn_Component import SignInComponent , ForgetPasswordFormUI
+from gui.Components.ForgetPassword_Component import ForgetPasswordFormUI
+from gui.Components.Base_Component import SignInComponent
 
 class ForgetPasswordForm(ctk.CTk):
     def __init__(self):

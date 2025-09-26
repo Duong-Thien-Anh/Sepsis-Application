@@ -1,10 +1,10 @@
 # main.py
 from gui.Views.SignIn import SignInForm
-from gui.Views.ForgetPassword import ForgetPasswordForm
+# from gui.Views.ForgetPassword import ForgetPasswordForm
 
 class MainApp:
     def __init__(self):
-        self.app = ForgetPasswordForm()
+        self.app = SignInForm()
 
 def run():
     main_app = MainApp()

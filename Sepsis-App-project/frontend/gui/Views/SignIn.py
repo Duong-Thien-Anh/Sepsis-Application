@@ -1,5 +1,6 @@
 import customtkinter as ctk
-from gui.Components.SignIn_Component import SignInFormUI , SignInComponent 
+from gui.Components.Base_Component import SignInComponent
+from controllers.SignIn_Controller import SignInController
 
 class SignInForm(ctk.CTk):
     def __init__(self):
@@ -12,11 +13,9 @@ class SignInForm(ctk.CTk):
         self.columnconfigure(0, weight=1)
 
         self.center_desktop()
-        self.Component = SignInComponent(self)
+        self.controller = SignInController()
+        self.Component = SignInComponent(master=self, controller=self.controller)
         self.Component.grid(row=0, column=0, sticky="nsew")  #  Thêm grid cho frame
-
-        self.SignIn = SignInFormUI(master=self.Component)
-        self.SignIn.grid(row=0, column=0, sticky="nsew")  #  Thêm grid cho UI
 
 # ========== CENTER DESKTOP ==========
     def center_desktop(self):
@@ -31,5 +30,5 @@ class SignInForm(ctk.CTk):
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2
         self.geometry(f"{width}x{height}+{x}+{y}")
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
+        # self.rowconfigure(0, weight=1)
+        # self.columnconfigure(0, weight=1)
