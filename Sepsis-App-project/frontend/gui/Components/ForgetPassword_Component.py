@@ -103,7 +103,7 @@ class ForgetPasswordFormUI(ctk.CTkFrame):
             width=100,
             height=45
         )
-        self.send_button.pack(pady=20)
+        self.send_button.pack(pady=(30))
         return self.send_button
 
     def on_send_click(self):

@@ -85,8 +85,8 @@ class SignInComponent(ctk.CTkFrame):
     def layer2_fr_signin(self, container):
 
         layer2 = ctk.CTkFrame(
-                container,
-                fg_color="#F7F7F5",
+            container,
+            fg_color="#F7F7F5",
         )
         layer2.grid(row=0, column=1, sticky="nsew", padx=(0, 10), pady=10)
         layer2.grid_propagate(False)
