@@ -8,7 +8,6 @@ class ForgetPasswordController:
         self.api_url = API_URL
         self.timeout = TIMEOUT
 
-        
 
         self.email_entry = None
         self.error_label = None
@@ -94,88 +93,6 @@ class ForgetPasswordController:
         else:
             print("⚠️ Email không hợp lệ → dừng lại")
 
-    # ========== SWITCH UI ==========
-    def switch_to_code_input(self, parent):
-        """Ẩn input + button cũ → Hiện 4 ô code + button xác nhận"""
-        self.email_entry.destroy()
-        self.send_button.destroy()
-        self.error_label.destroy()
-        self.underline_frame.destroy()
-        
-
-        title_label = ctk.CTkLabel(
-            parent,
-            text="Vui lòng nhập mã xác nhận !",
-            font=("Arial", 20, "bold"),
-            text_color="#66B7FF",
-        )
-        title_label.pack(pady=(25, 0))
-
-        # ---- 4 ô nhập code ----
-        code_frame = ctk.CTkFrame(parent, fg_color="#FFFFFF")
-        code_frame.pack(pady=(20, 10))
-
-        self.code_entries = []
-
-        def on_key_release(event, idx):
-            value = event.widget.get()
-
-            # Xử lý phím Backspace
-            if event.keysym == "BackSpace":
-                if value == "" and idx > 0:
-                    prev_entry = self.code_entries[idx - 1]
-                    prev_entry.delete(0, ctk.END)
-                    prev_entry.focus()
-                return
-
-            # Nếu paste nhiều ký tự
-            if len(value) > 1:
-                first_char = value[0]
-                event.widget.delete(0, ctk.END)
-                event.widget.insert(0, first_char)
-
-                remaining = value[1:]
-                next_idx = idx + 1
-                while remaining and next_idx < len(self.code_entries):
-                    next_entry = self.code_entries[next_idx]
-                    if next_entry.get() == "":
-                        next_entry.insert(0, remaining[0])
-                        remaining = remaining[1:]
-                    next_idx += 1
-
-            elif len(value) == 1 and idx < len(self.code_entries) - 1:
-                # Nhập 1 ký tự thì nhảy sang ô tiếp theo
-                self.code_entries[idx + 1].focus()
-
-        for i in range(4):
-            entry = ctk.CTkEntry(
-                code_frame,
-                width=50,
-                height=50,
-                justify="center",
-                font=("Arial", 18, "bold"),
-            )
-            entry.grid(row=0, column=i, padx=5)
-            entry.bind("<KeyRelease>", lambda e, idx=i: on_key_release(e, idx))
-            self.code_entries.append(entry)
-
-        # ---- Button xác nhận ----
-        confirm_btn = ctk.CTkButton(
-            parent,
-            text="Xác nhận",
-            fg_color="#66B7FF",
-            hover_color="#45a049",
-            text_color="white",
-            command=self.on_confirm_code,
-            corner_radius=8,
-            border_color="#000000",
-            border_width=1,
-            font=("Arial", 14, "bold"),
-            width=100,
-            height=45
-        )
-        confirm_btn.pack(pady=20)
-
     # ========= HANDLE CONFIRM =========
     def on_confirm_code(self):
         code = "".join([e.get() for e in self.code_entries])
@@ -183,3 +100,43 @@ class ForgetPasswordController:
             print(f"✅ Code nhập: {code}")
         else:
             print("⚠️ Code chưa hợp lệ")
+
+    # ==========SWITCH UI PROCESS ==========
+    def switch_to_code_input(self, parent):
+        """Ẩn input + button cũ → Hiện 4 ô code + button xác nhận"""
+        self.email_entry.destroy()
+        self.send_button.destroy()
+        self.error_label.destroy()
+        self.underline_frame.destroy()
+
+        self.code_entries = []
+
+    def on_key_release(self, event, idx):
+        value = event.widget.get()
+
+        # Xử lý phím Backspace
+        if event.keysym == "BackSpace":
+            if value == "" and idx > 0:
+                prev_entry = self.code_entries[idx - 1]
+                prev_entry.delete(0, ctk.END)
+                prev_entry.focus()
+            return
+            
+        # Nếu paste nhiều ký tự
+        if len(value) > 1:
+            first_char = value[0]
+            event.widget.delete(0, ctk.END)
+            event.widget.insert(0, first_char)
+
+            remaining = value[1:]
+            next_idx = idx + 1
+            while remaining and next_idx < len(self.code_entries):
+                next_entry = self.code_entries[next_idx]
+                if next_entry.get() == "":
+                    next_entry.insert(0, remaining[0])
+                    remaining = remaining[1:]
+                next_idx += 1
+
+        elif len(value) == 1 and idx < len(self.code_entries) - 1:
+            # Nhập 1 ký tự thì nhảy sang ô tiếp theo
+            self.code_entries[idx + 1].focus()
