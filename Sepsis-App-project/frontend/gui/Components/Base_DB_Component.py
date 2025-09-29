@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from PIL import Image
 from assets.Assets_Management import AssetManager
+from gui.Components.Home_Component import HomeFormUI
 
 # ========== SIGN IN COMPONENT ==========
 class DashBoardComponent(ctk.CTkFrame):
@@ -15,8 +16,8 @@ class DashBoardComponent(ctk.CTkFrame):
         outer_DB = self.outer_fr_dashboard()
         container_DB = self.container_fr_dashboard(outer_DB)
 
-        self.layer1_DB = self.layer1_fr_dashboard(container_DB)
-        self.layer2_DB = self.layer2_fr_dashboard(container_DB)
+        layer1_DB = self.layer1_fr_dashboard(container_DB)
+        layer2_DB = self.layer2_fr_dashboard(container_DB)
 
         menu_bar = self.menu_bar(outer_DB)
 
@@ -109,12 +110,21 @@ class DashBoardComponent(ctk.CTkFrame):
     def layer1_fr_dashboard(self, container_DB):
         layer1_DB = ctk.CTkFrame(
             container_DB,
-            fg_color="#F72700",
             height=30 
         )
         layer1_DB.grid(row=0, column=0, sticky="nsew", padx=(10,10), pady=(10,0)) 
         layer1_DB.grid_propagate(False)
         layer1_DB.pack_propagate(False)
+
+        layer1_DB.grid_rowconfigure(0, weight=1)
+        layer1_DB.grid_columnconfigure(0, weight=1)
+        layer1_DB.grid_columnconfigure(1, weight=1)
+        layer1_DB.grid_columnconfigure(2, weight=0)
+        layer1_DB.grid_columnconfigure(3, weight=0)
+
+        #header
+        self.header = HomeFormUI(layer1_DB)
+        self.header.create_header(layer1_DB)
 
         return layer1_DB
     # ========== LAYER 2 ==========

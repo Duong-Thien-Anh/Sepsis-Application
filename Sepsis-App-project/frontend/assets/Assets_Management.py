@@ -7,7 +7,8 @@ class AssetManager:
         images = {
                 #Dùng cho form đăng nhập
                 "SignIn_Pic" : BASE_DIR / "images" / "SignIn_Pic.png",
-                "Gmail_Icon" : BASE_DIR / "images" / "Gmail_Icon.png"
+                "Gmail_Icon" : BASE_DIR / "images" / "Gmail_Icon.png",
+                "Title_Home" : BASE_DIR / "images" / "TitleHome_Pic.png"
 
         }
         icons = {
@@ -20,6 +21,7 @@ class AssetManager:
                 "btn_Recall_Appointment" : BASE_DIR / "icons" / "btn_Recall_Appointment.png",
                 "btn_setting"          : BASE_DIR / "icons" / "btn_setting.png",
                 "btn_Sign_Out"         : BASE_DIR / "icons" / "btn_Sign_Out.png",
+                "btn_Notification"     : BASE_DIR / "icons" / "btn_Notification.png",
         }
 
         @classmethod

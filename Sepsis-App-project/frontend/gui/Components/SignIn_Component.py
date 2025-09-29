@@ -7,7 +7,7 @@ from assets.Assets_Management import AssetManager
 # ========== SIGN IN FORM ==========
 class SignInFormUI(ctk.CTkFrame):
     def __init__(self,master ,parent_component=None):
-        super().__init__(master)
+        super().__init__(master, fg_color ="#F7F7F5")
         self.controller = SignInController()
         self.parent_component = parent_component  # call show_forgetpassword()
         self.pack(fill="both", expand=True)
