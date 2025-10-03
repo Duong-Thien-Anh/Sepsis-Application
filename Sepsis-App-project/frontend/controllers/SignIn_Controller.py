@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 class SignInController():
     def __init__(self, api_url=None, timeout=5):
-        self.api_url = api_url or "http://localhost:8000"
+        self.api_url = api_url or "http://localhost:5000/api"
         self.timeout = timeout
         print(f"Using API: {self.api_url} with timeout: {self.timeout}")
         
@@ -135,4 +135,30 @@ class SignInController():
                 return f"Đăng nhập thất bại: {response.json().get('detail')}"
         except Exception as e:
             messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")
+
+    # ========== login_API ==========
+
+
+    def login1(self, username, password):
+        if not username or not password:
+            messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
+            return
+
+        try:
+            # Gọi API login ở BE (http://localhost:5000/api/auth/login)
+            url = f"{self.api_url}/auth/login"
+            payload = {"username": username, "password": password}
+            response = requests.post(url, json=payload)
+
+            if response.status_code == 200:
+                data = response.json()
+                return f"✅ {data['message']} (User: {data.get('user', {}).get('username', 'unknown')})"
+            else:
+                data = response.json()
+                return f"❌ Đăng nhập thất bại: {data.get('detail', 'Unknown error')}"
+        except Exception as e:
+            messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")
+
+
+
 

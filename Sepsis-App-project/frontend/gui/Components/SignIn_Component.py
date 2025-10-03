@@ -146,7 +146,7 @@ class SignInFormUI(ctk.CTkFrame):
         
         #========== LOGIN FUNCTION ==========
         try : 
-            result = self.controller.login(username.strip(), password.strip())
+            result = self.controller.login1(username.strip(), password.strip())
 
         except NameError:
             print("Lỗi: Chưa định nghĩa hàm đăng nhập.")

@@ -1,46 +1,42 @@
-BASE_URL = "http://localhost:8000/api/v1"
+# Base URL của backend
+BASE_URL = "http://localhost:5000/api"
 
-# -------------------------------
-# Auth APIs
-# -------------------------------
-def get_auth_urls():
-    return {
+API_ROUTES = {
+    # -------------------------------
+    # Auth APIs
+    # -------------------------------
+    "auth": {
         "login": f"{BASE_URL}/auth/login",
         "register": f"{BASE_URL}/auth/register",
         "logout": f"{BASE_URL}/auth/logout",
         "refresh_token": f"{BASE_URL}/auth/refresh",
-    }
+    },
 
-
-# -------------------------------
-# User APIs
-# -------------------------------
-def get_user_urls():
-    return {
+    # -------------------------------
+    # User APIs
+    # -------------------------------
+    "user": {
         "get_user": f"{BASE_URL}/users/me",
         "update_user": f"{BASE_URL}/users/update",
         "change_password": f"{BASE_URL}/users/change-password",
-    }
+    },
 
+    # -------------------------------
+    # Patient APIs
+    # -------------------------------
+    "patient": {
+        "list": f"{BASE_URL}/patients",
+        "create": f"{BASE_URL}/patients/create",
+        "update": f"{BASE_URL}/patients/update",
+        "delete": f"{BASE_URL}/patients/delete",
+    },
 
-# -------------------------------
-# Patient APIs
-# -------------------------------
-def get_patient_urls():
-    return {
-        "list_patients": f"{BASE_URL}/patients",
-        "create_patient": f"{BASE_URL}/patients/create",
-        "update_patient": f"{BASE_URL}/patients/update",
-        "delete_patient": f"{BASE_URL}/patients/delete",
-    }
-
-
-# -------------------------------
-# Report APIs
-# -------------------------------
-def get_report_urls():
-    return {
-        "list_reports": f"{BASE_URL}/reports",
-        "export_report": f"{BASE_URL}/reports/export",
+    # -------------------------------
+    # Report APIs
+    # -------------------------------
+    "report": {
+        "list": f"{BASE_URL}/reports",
+        "export": f"{BASE_URL}/reports/export",
         "statistics": f"{BASE_URL}/reports/statistics",
     }
+}
