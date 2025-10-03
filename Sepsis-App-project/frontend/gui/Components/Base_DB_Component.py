@@ -3,6 +3,7 @@ import tkinter as tk
 from PIL import Image
 from assets.Assets_Management import AssetManager
 from gui.Components.Header_Component import HeaderFormUI
+from gui.Components.Home_Component import HomeUI
 
 # ========== SIGN IN COMPONENT ==========
 class DashBoardComponent(ctk.CTkFrame):
@@ -16,15 +17,17 @@ class DashBoardComponent(ctk.CTkFrame):
         outer_DB = self.outer_fr_dashboard()
         container_DB = self.container_fr_dashboard(outer_DB)
 
-        layer1_DB = self.layer1_fr_dashboard(container_DB)
-        layer2_DB = self.layer2_fr_dashboard(container_DB)
+        self.layer1_DB = self.layer1_fr_dashboard(container_DB)
+        self.layer2_DB = self.layer2_fr_dashboard(container_DB)
 
         menu_bar = self.menu_bar(outer_DB)
+        #maincontent mặc định ở layer 2
+        self.show_content(HomeUI)
 
 
     # ========== OUTER =====================
-    def outer_fr_dashboard(self):
     # Outer frame to provide a black border for the window
+    def outer_fr_dashboard(self):
         outer_DB = ctk.CTkFrame(
             self,
             fg_color="#66B7FF",
@@ -54,18 +57,18 @@ class DashBoardComponent(ctk.CTkFrame):
         menu_bar.grid_columnconfigure(0, weight=1) 
 
         icons = [
-            "btn_Menu",
-            "btn_Ai",
-            "btn_Patient",
-            "btn_Employee",
-            "btn_Account",
-            "btn_Recall_Appointment",
-            "btn_setting",
-            "btn_Sign_Out"
+            ("btn_Menu", HomeUI),
+            ("btn_Ai", HomeUI),
+            ("btn_Patient", HomeUI),
+            ("btn_Employee", HomeUI),
+            ("btn_Account", HomeUI),
+            ("btn_Recall_Appointment", HomeUI),
+            ("btn_setting", HomeUI),
+            ("btn_Sign_Out", HomeUI)
         ]
 
         row = 0
-        for key in icons:
+        for key , page_class in icons:
             try:
                 path = AssetManager.get_icon_path(key)
                 image = ctk.CTkImage(
@@ -131,13 +134,23 @@ class DashBoardComponent(ctk.CTkFrame):
     def layer2_fr_dashboard(self, container_DB):
         layer2_DB = ctk.CTkFrame(
             container_DB,
-            fg_color="#0031F7",
+            fg_color="transparent",
         )
         layer2_DB.grid(row=1, column=0, sticky="nsew", padx=(10,10), pady=(10,10)) 
         layer2_DB.grid_propagate(False)
         layer2_DB.pack_propagate(False)
 
         return layer2_DB
+
+    # ========== SHOW CONTENT ==========
+    def show_content(self,content_class):
+        # Xoá nội dung hiện tại trong layer2
+        for widget in self.layer2_DB.winfo_children():
+            widget.destroy()
+
+        # Tạo và hiển thị nội dung mới
+        content = content_class(self.layer2_DB)
+        content.pack(fill="both", expand=True)
 
 
 
