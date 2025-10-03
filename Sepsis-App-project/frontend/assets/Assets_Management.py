@@ -8,7 +8,8 @@ class AssetManager:
                 #Dùng cho form đăng nhập
                 "SignIn_Pic" : BASE_DIR / "images" / "SignIn_Pic.png",
                 "Gmail_Icon" : BASE_DIR / "images" / "Gmail_Icon.png",
-                "Title_Home" : BASE_DIR / "images" / "TitleHome_Pic.png"
+                "Title_Home" : BASE_DIR / "images" / "TitleHome_Pic.png",
+                "Avatar_Default" : BASE_DIR / "images" / "Avatar_Default.png"
 
         }
         icons = {
@@ -22,6 +23,8 @@ class AssetManager:
                 "btn_setting"          : BASE_DIR / "icons" / "btn_setting.png",
                 "btn_Sign_Out"         : BASE_DIR / "icons" / "btn_Sign_Out.png",
                 "btn_Notification"     : BASE_DIR / "icons" / "btn_Notification.png",
+                "icon_Bell"            : BASE_DIR / "icons" / "icon_Bell.png",
+                "badge_Red"            : BASE_DIR / "icons" / "badge_Red.png"
         }
 
         @classmethod
