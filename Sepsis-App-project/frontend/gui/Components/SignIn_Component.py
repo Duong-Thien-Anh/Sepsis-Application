@@ -86,7 +86,7 @@ class SignInFormUI(ctk.CTkFrame):
         eye_button = ctk.CTkButton(
             password_frame,
             text="👁",
-            command=lambda: setup_password_entry(password_entry ,eye_button),
+            command=lambda: self.controller.toggle_password_visibility(password_entry, eye_button, state={"visible": False}),
             width=30,
             height=30,
             fg_color="white",
@@ -146,7 +146,7 @@ class SignInFormUI(ctk.CTkFrame):
         
         #========== LOGIN FUNCTION ==========
         try : 
-            result = login(username.strip(), password.strip())
+            result = self.controller.login1(username.strip(), password.strip())
 
         except NameError:
             print("Lỗi: Chưa định nghĩa hàm đăng nhập.")
