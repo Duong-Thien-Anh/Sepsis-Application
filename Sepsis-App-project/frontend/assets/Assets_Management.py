@@ -24,7 +24,8 @@ class AssetManager:
                 "btn_Sign_Out"         : BASE_DIR / "icons" / "btn_Sign_Out.png",
                 "btn_Notification"     : BASE_DIR / "icons" / "btn_Notification.png",
                 "icon_Bell"            : BASE_DIR / "icons" / "icon_Bell.png",
-                "badge_Red"            : BASE_DIR / "icons" / "badge_Red.png"
+                "badge_Red"            : BASE_DIR / "icons" / "badge_Red.png",
+                "btn_Refresh"          : BASE_DIR / "icons" / "btn_Refresh.png"
         }
 
         @classmethod

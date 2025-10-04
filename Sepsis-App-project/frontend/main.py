@@ -4,7 +4,7 @@ from gui.Views.Dashboard import DashBoardForm
 
 class MainApp:
     def __init__(self):
-        self.app = SignInForm()
+        self.app = DashBoardForm()
 
 def run():
     main_app = MainApp()
