@@ -86,7 +86,7 @@ class SignInFormUI(ctk.CTkFrame):
         eye_button = ctk.CTkButton(
             password_frame,
             text="👁",
-            command=lambda: setup_password_entry(password_entry ,eye_button),
+            command=lambda: self.controller.setup_password_entry(password_entry ,eye_button),
             width=30,
             height=30,
             fg_color="white",
@@ -116,7 +116,7 @@ class SignInFormUI(ctk.CTkFrame):
             text_color="white",
             corner_radius=8,
             border_color="#000000",
-            border_width=1,
+            border_width=2,
             font=("Arial", 14, "bold"),
             width=200,
             height=45
@@ -146,7 +146,7 @@ class SignInFormUI(ctk.CTkFrame):
         
         #========== LOGIN FUNCTION ==========
         try : 
-            result = login(username.strip(), password.strip())
+            result = self.controller.login(username.strip(), password.strip())
 
         except NameError:
             print("Lỗi: Chưa định nghĩa hàm đăng nhập.")
@@ -189,7 +189,7 @@ class SignInFormUI(ctk.CTkFrame):
                 text_color="white",
                 corner_radius=8,
                 border_color="#000000",
-                border_width=1,
+                border_width=2,
                 font=("Arial", 14, "bold"),
                 width=200,
                 height=45

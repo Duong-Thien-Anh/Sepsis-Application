@@ -45,7 +45,7 @@ class SignInComponent(ctk.CTkFrame):
             fg_color="#F7F7F5",   
             corner_radius=15,
             border_color="#000000",
-            border_width=2,
+            border_width=3,
         )
         container.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
         container.grid_propagate(False)

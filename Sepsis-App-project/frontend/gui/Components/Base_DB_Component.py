@@ -4,6 +4,7 @@ from PIL import Image
 from assets.Assets_Management import AssetManager
 from gui.Components.Header_Component import HeaderFormUI
 from gui.Components.Home_Component import HomeUI
+from gui.Components.Ai_Component import AI_UI
 
 # ========== SIGN IN COMPONENT ==========
 class DashBoardComponent(ctk.CTkFrame):
@@ -58,7 +59,7 @@ class DashBoardComponent(ctk.CTkFrame):
 
         icons = [
             ("btn_Menu", HomeUI),
-            ("btn_Ai", HomeUI),
+            ("btn_Ai", AI_UI),
             ("btn_Patient", HomeUI),
             ("btn_Employee", HomeUI),
             ("btn_Account", HomeUI),
@@ -84,7 +85,8 @@ class DashBoardComponent(ctk.CTkFrame):
                     height=50,
                     corner_radius=10,
                     fg_color="transparent",  # nền trong suốt
-                    hover_color="#FE5858"
+                    hover_color="#FE5858",
+                    command=lambda pc=page_class: self.show_content(pc) 
                 )
                 btn.grid(row=row, column=0, pady=10, padx=10, sticky="nsew")
                 row += 1

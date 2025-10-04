@@ -7,7 +7,7 @@ from controllers.SignIn_Controller import SignInController
 # ========== FORGET PASSWORD FORM ==========
 class ForgetPasswordFormUI(ctk.CTkFrame):
     def __init__(self,master ,parent_component=None):
-        super().__init__(master)
+        super().__init__(master , fg_color ="#F7F7F5")
         self.ForgetPW_Ctrl = ForgetPasswordController()
         # optional: allow controller to call back component if needed
         try:
@@ -98,7 +98,7 @@ class ForgetPasswordFormUI(ctk.CTkFrame):
             command=self.on_send_click,  # component handles flow
             corner_radius=8,
             border_color="#000000",
-            border_width=1,
+            border_width=2,
             font=("Arial", 14, "bold"),
             width=100,
             height=45
@@ -157,7 +157,7 @@ class ForgetPasswordFormUI(ctk.CTkFrame):
             command=lambda: getattr(self.ForgetPW_Ctrl, "on_confirm_code", lambda : None)(),
             corner_radius=8,
             border_color="#000000",
-            border_width=1,
+            border_width=2,
             font=("Arial", 14, "bold"),
             width=100,
             height=45
