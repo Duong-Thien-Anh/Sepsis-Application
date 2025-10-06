@@ -86,7 +86,7 @@ class SignInFormUI(ctk.CTkFrame):
         eye_button = ctk.CTkButton(
             password_frame,
             text="👁",
-            command=lambda: self.controller.setup_password_entry(password_entry ,eye_button),
+            command=lambda: self.controller.toggle_password_visibility(password_entry, eye_button, state={"visible": False}),
             width=30,
             height=30,
             fg_color="white",
