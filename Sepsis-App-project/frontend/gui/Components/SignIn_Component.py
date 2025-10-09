@@ -3,6 +3,7 @@ import tkinter as tk
 from PIL import Image
 from controllers.SignIn_Controller import SignInController
 from assets.Assets_Management import AssetManager
+from gui.Components.Base_DB_Component import DashBoardComponent
 
 # ========== SIGN IN FORM ==========
 class SignInFormUI(ctk.CTkFrame):
@@ -162,9 +163,17 @@ class SignInFormUI(ctk.CTkFrame):
         elif "Đăng nhập thành công" in result.lower():
 
             print(f"Kết quả đăng nhập: {result}")
-            # Có thể thêm logic chuyển trang ở đây
-            # self.destroy()  # Đóng cửa sổ đăng nhập
-            # open_main_window()  # Mở cửa sổ chính
+            # Ẩn form đăng nhập
+            self.pack_forget()
+
+            # Hiển thị giao diện chính (DashBoardComponent)
+            try:
+                self.dashboard = DashBoardComponent(self.master)
+                self.dashboard.pack(fill="both", expand=True)
+                print("✅ Chuyển sang giao diện chính thành công.")
+            except Exception as e:
+                print(f"❌ Lỗi khi mở DashBoardComponent: {e}")
+
         else:
             print(f"Kết quả đăng nhập không đúng: {result}")
         # Hiển thị thông báo lỗi

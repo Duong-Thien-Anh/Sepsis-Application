@@ -118,7 +118,7 @@ class SignInController():
 
     # ========== HANDLE SIGN IN BUTTON CLICK ==========
     
-    def login(self,username , password):
+    def login(self, username, password, on_success=None):
         if not username or not password:
             messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
             return
@@ -130,15 +130,22 @@ class SignInController():
 
             if response.status_code == 200:
                 data = response.json()
-                return f"Đăng nhập thành công! Token: {data['access_token']}"
-            else:       
-                return f"Đăng nhập thất bại: {response.json().get('detail')}"
+                
+                # Nếu login thành công -> hiện thông báo và chuyển trang
+                messagebox.showinfo("Đăng nhập", "Đăng nhập thành công!")
+                
+                if on_success:  # Gọi callback để chuyển sang trang Home
+                    on_success()
+                return True
+            else:
+                data = response.json()
+                messagebox.showerror("Lỗi", data.get('detail', 'Đăng nhập thất bại!'))
+                return False
         except Exception as e:
             messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")
+            return False
 
     # ========== login_API ==========
-
-
     def login1(self, username, password):
         if not username or not password:
             messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
