@@ -8,10 +8,10 @@ from gui.Components.Ai_Component import AI_UI
 
 # ========== SIGN IN COMPONENT ==========
 class DashBoardComponent(ctk.CTkFrame):
-    def __init__(self, master,controller):
+    def __init__(self, master):
         super().__init__(master)
 
-        self.controller = controller
+        self.pack(fill="both", expand=True)
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 

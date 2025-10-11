@@ -3,7 +3,7 @@ import tkinter as tk
 from PIL import Image
 from assets.Assets_Management import AssetManager
 from gui.Components.ForgetPassword_Component import ForgetPasswordFormUI
-from gui.Components.SignIn_Component import SignInFormUI
+from gui.Components.Login_Component import LoginFormUI
 
 # ========== SIGN IN COMPONENT ==========
 class SignInComponent(ctk.CTkFrame):
@@ -97,7 +97,7 @@ class SignInComponent(ctk.CTkFrame):
     # ========== FORM HANDLING ==========
     def show_signin_form(self):
         self.clear_layer2()
-        self.current_form = SignInFormUI(
+        self.current_form = LoginFormUI(
             self.layer2, parent_component=self
         )  # truyền parent để gọi switch
         self.current_form.pack(expand=True, fill="both")

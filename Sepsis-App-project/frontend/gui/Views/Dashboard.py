@@ -2,8 +2,8 @@ import customtkinter as ctk
 from gui.Components.Base_DB_Component import DashBoardComponent
 
 class DashBoardForm(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, master=None):
+        super().__init__(master)
         #setting background windows
         self.minsize(1062,600)
         self.center_desktop(1062,600)
@@ -12,7 +12,8 @@ class DashBoardForm(ctk.CTk):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
-        self.Component = DashBoardComponent(master=self, controller=None)
+        # DashBoardComponent currently accepts only the master/top-level window.
+        self.Component = DashBoardComponent(master=self)
         self.Component.grid(row=0, column=0, sticky="nsew")  #  Thêm grid cho frame
 
 # ========== CENTER DESKTOP ==========

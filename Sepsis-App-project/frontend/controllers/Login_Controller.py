@@ -6,7 +6,8 @@ import requests
 import re 
 from dotenv import load_dotenv
 
-class SignInController():
+
+class LoginController():
     def __init__(self, api_url=None, timeout=5):
         self.api_url = api_url or "http://localhost:5000/api"
         self.timeout = timeout
@@ -146,25 +147,42 @@ class SignInController():
             return False
 
     # ========== login_API ==========
-    def login1(self, username, password):
+    def login1(self, username, password, current_window=None):
         if not username or not password:
             messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
-            return
+            return "error" , "Thiếu thông tin"
 
         try:
             # Gọi API login ở BE (http://localhost:5000/api/auth/login)
             url = f"{self.api_url}/auth/login"
             payload = {"username": username, "password": password}
-            response = requests.post(url, json=payload)
+            response = requests.post(url, json=payload , timeout=self.timeout)
 
-            if response.status_code == 200:
-                data = response.json()
-                return f"✅ {data['message']} (User: {data.get('user', {}).get('username', 'unknown')})"
+            data = response.json()
+            print("Response from login API:", data)
+
+            if response.status_code == 200 and data.get("success") == True:
+                messagebox.showinfo("Đăng nhập thành công", f"Xin chào {data['user']['username']}!")
+                
+                try:
+                    current_window.withdraw()
+                except Exception as e:
+                    print("Không thể destroy window:", e)
+
+                # ✅ Đóng cửa sổ đăng nhập
+                from gui.Views.Dashboard import DashBoardForm
+                # ✅ Mở DashboardForm
+                dashboard = DashBoardForm(current_window)
+                dashboard.grab_set()
+
+                return "success", data 
             else:
-                data = response.json()
-                return f"❌ Đăng nhập thất bại: {data.get('detail', 'Unknown error')}"
+                messagebox.showerror("Lỗi đăng nhập", f"Đăng nhập thất bại: {data.get('message', 'Sai thông tin đăng nhập')}")
+                return "error", data.get("message", "Sai thông tin đăng nhập")
+            
         except Exception as e:
             messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")
+            return "error", str(e)
 
 
 

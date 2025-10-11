@@ -1,15 +1,16 @@
+from email.mime import message
 import customtkinter as ctk
 import tkinter as tk
 from PIL import Image
-from controllers.SignIn_Controller import SignInController
+from controllers.Login_Controller import LoginController
 from assets.Assets_Management import AssetManager
 from gui.Components.Base_DB_Component import DashBoardComponent
 
-# ========== SIGN IN FORM ==========
-class SignInFormUI(ctk.CTkFrame):
+# ========== LOGIN FORM ==========
+class LoginFormUI(ctk.CTkFrame):
     def __init__(self,master ,parent_component=None):
         super().__init__(master, fg_color ="#F7F7F5")
-        self.controller = SignInController()
+        self.Login_Ctrl = LoginController()
         self.parent_component = parent_component  # call show_forgetpassword()
         self.pack(fill="both", expand=True)
 
@@ -52,7 +53,7 @@ class SignInFormUI(ctk.CTkFrame):
             height=40,
         )
         username_entry.pack(pady=(40, 0), padx=35, fill="x")
-        self.controller.setup_username_entry(username_entry, placeholder="Nhập tên đăng nhập")
+        self.Login_Ctrl.setup_username_entry(username_entry, placeholder="Nhập tên đăng nhập")
 
         underline_frame = ctk.CTkFrame(
                 form_signin,
@@ -87,7 +88,7 @@ class SignInFormUI(ctk.CTkFrame):
         eye_button = ctk.CTkButton(
             password_frame,
             text="👁",
-            command=lambda: self.controller.toggle_password_visibility(password_entry, eye_button, state={"visible": False}),
+            command=lambda: self.Login_Ctrl.toggle_password_visibility(password_entry, eye_button, state={"visible": False}),
             width=30,
             height=30,
             fg_color="white",
@@ -96,7 +97,7 @@ class SignInFormUI(ctk.CTkFrame):
             font=("Arial", 18, "bold")
         )
         eye_button.pack(side=tk.RIGHT, padx=(5, 0))
-        self.controller.setup_password_entry(password_entry, placeholder="Mật khẩu", eye_button=eye_button)
+        self.Login_Ctrl.setup_password_entry(password_entry, placeholder="Mật khẩu", eye_button=eye_button)
 
         underline_frame = ctk.CTkFrame(
             form_signin,
@@ -126,59 +127,56 @@ class SignInFormUI(ctk.CTkFrame):
         return signin_button
 
     def handle_signin_click(self):
-        username = ""
-        if hasattr(self, 'username'):
-            if isinstance(self.username, tuple):
-                username = self.username[0].get()
-            else:
-                username = self.username.get()
+        username = self.username.get().strip() if hasattr(self, "username") else ""
+        password = self.password.get().strip() if hasattr(self, "password") else ""
 
-        password = ""
-        if hasattr(self, 'password'):
-            if isinstance(self.password, tuple):
-                password = self.password[0].get()
-            else:
-                password = self.password.get()
-
-        if username == "Nhập tên đăng nhập":
-            username = ""
-        if password == "Mật khẩu":
-            password = ""
-        
-        #========== LOGIN FUNCTION ==========
-        try : 
-            result = self.controller.login1(username.strip(), password.strip())
-
-        except NameError:
-            print("Lỗi: Chưa định nghĩa hàm đăng nhập.")
-            return 
-        except  Exception as e:
-            print(f"Lỗi khi gọi hàm đăng nhập: {e}")
+        if username in ["", "Nhập tên đăng nhập"] or password in ["", "Mật khẩu"]:
+            tk.messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!")
             return
 
+        try:
+            # Không truyền widget/object vào controller để tránh vô tình gán
+            # đối tượng vào tham số màu hoặc cấu hình widget.
+            result = self.Login_Ctrl.login1(username, password)
+        except Exception as e:
+            tk.messagebox.showerror("Lỗi", f"Lỗi khi gọi hàm đăng nhập: {e}")
+            return
+        
+         # ✅ Nếu controller trả tuple (success, message)
+        if isinstance(result, tuple):
+            success, message = result
+        elif isinstance(result, dict):
+            success = result.get("success", False)
+            message = result.get("message", "")
+        else:
+            success, message = False, str(result)
+
         # Xử lý kết quả đăng nhập
+        if success:
+            print(f"✅ Đăng nhập thành công: {message}")
+            tk.messagebox.showinfo("Đăng nhập thành công", f"Xin chào {username}!")
 
-        if result is None:
-            print("Lỗi: Kết quả đăng nhập trả về None.")
-        elif "Đăng nhập thành công" in result.lower():
-
-            print(f"Kết quả đăng nhập: {result}")
-            # Ẩn form đăng nhập
-            self.pack_forget()
-
-            # Hiển thị giao diện chính (DashBoardComponent)
+            # Đóng cửa sổ SignIn hiện tại và mở một cửa sổ Dashboard mới.
             try:
-                self.dashboard = DashBoardComponent(self.master)
-                self.dashboard.pack(fill="both", expand=True)
+                root = self.winfo_toplevel()
+                try:
+                    root.destroy()
+                except Exception:
+                    try:
+                        root.withdraw()
+                    except Exception:
+                        pass
+
+                # Khởi tạo và hiển thị DashboardForm mới (là một CTk root riêng)
+                from gui.Views.Dashboard import DashBoardForm
+                dashboard_window = DashBoardForm()
+                dashboard_window.mainloop()
                 print("✅ Chuyển sang giao diện chính thành công.")
             except Exception as e:
-                print(f"❌ Lỗi khi mở DashBoardComponent: {e}")
-
+                print(f"❌ Lỗi khi mở DashBoardForm: {e}")
         else:
-            print(f"Kết quả đăng nhập không đúng: {result}")
-        # Hiển thị thông báo lỗi
-        if "Đăng nhập thất bại" in result or "Lỗi kết nối" in result:
-            tk.messagebox.showerror("Lỗi đăng nhập", result)
+            print(f"❌ Đăng nhập thất bại: {message}")
+            tk.messagebox.showerror("Lỗi đăng nhập", message)
 
     # ========== BUTTON GMAIL ==========
     def button_gmail_fr_signin(self, form_signin):
@@ -230,7 +228,7 @@ class SignInFormUI(ctk.CTkFrame):
             font=("Arial", 12, "underline"),
         )
         forget_password_link.pack(pady=(5, 0), padx=35, fill="x")
-        self.controller.hover_effect_label_forget_password(forget_password_link)
+        self.Login_Ctrl.hover_effect_label_forget_password(forget_password_link)
         def on_click(event=None):
             try:
                 if self.parent_component and hasattr(self.parent_component, "show_forgetpassword_form"):
@@ -243,4 +241,3 @@ class SignInFormUI(ctk.CTkFrame):
         forget_password_link.bind("<Button-1>", on_click)
         return forget_password_link
 
- 

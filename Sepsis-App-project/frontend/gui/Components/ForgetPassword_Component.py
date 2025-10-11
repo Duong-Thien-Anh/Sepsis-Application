@@ -2,7 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from PIL import Image
 from controllers.ForgetPassword_Controller import ForgetPasswordController
-from controllers.SignIn_Controller import SignInController
+from controllers.Login_Controller import LoginController
 
 # ========== FORGET PASSWORD FORM ==========
 class ForgetPasswordFormUI(ctk.CTkFrame):
@@ -14,7 +14,7 @@ class ForgetPasswordFormUI(ctk.CTkFrame):
             self.ForgetPW_Ctrl.component = self
         except Exception:
             pass
-        self.SignIn_Ctrl = SignInController()
+        self.Login_Ctrl = LoginController()
         self.parent_component = parent_component  # call show_signin()
         self.pack(fill="both", expand=True)
 

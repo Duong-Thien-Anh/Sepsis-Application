@@ -4,13 +4,19 @@ from gui.Views.Dashboard import DashBoardForm
 
 class MainApp:
     def __init__(self):
-        self.app = SignInForm()
+        # Do not create nested MainApp instances here. Create the GUI window instance.
+        self.root = SignInForm()
 
-def run():
-    main_app = MainApp()
-    return main_app.app, main_app
+    def run(self):
+        """Start and return the GUI root and this MainApp instance."""
+        return self.root, self
+
+def main():
+    app = MainApp()
+    root, _ = app.run()
+    root.mainloop()
+
 
 if __name__ == "__main__":
-    root, app = run()
-    root.mainloop()
+    main()
 
