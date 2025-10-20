@@ -6,10 +6,19 @@ from gui.Components.Header_Component import HeaderFormUI
 from gui.Components.Home_Component import HomeUI
 from gui.Components.Ai_Component import AI_UI
 
-# ========== SIGN IN COMPONENT ==========
+# ========== DASHBOARD COMPONENT ==========
 class DashBoardComponent(ctk.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, parent_window=None):
+        """
+        Component Dashboard chính (CTkFrame).
+        
+        Args:
+            master: Container frame
+            parent_window: Frame_DB instance (để gọi logout())
+        """
         super().__init__(master)
+        
+        self.parent_window = parent_window  # Reference để logout
 
         self.pack(fill="both", expand=True)
         self.rowconfigure(0, weight=1)
@@ -58,18 +67,22 @@ class DashBoardComponent(ctk.CTkFrame):
         menu_bar.grid_columnconfigure(0, weight=1) 
 
         icons = [
-            ("btn_Menu", HomeUI),
-            ("btn_Ai", AI_UI),
-            ("btn_Patient", HomeUI),
-            ("btn_Employee", HomeUI),
-            ("btn_Account", HomeUI),
-            ("btn_Recall_Appointment", HomeUI),
-            ("btn_setting", HomeUI),
-            ("btn_Sign_Out", HomeUI)
+            ("btn_Menu", HomeUI, None),
+            ("btn_Ai", AI_UI, None),
+            ("btn_Patient", HomeUI, None),
+            ("btn_Employee", HomeUI, None),
+            ("btn_Account", HomeUI, None),
+            ("btn_Recall_Appointment", HomeUI, None),
+            ("btn_setting", HomeUI, None),
+            ("btn_Sign_Out", None, "logout")  # Special: logout action
         ]
 
         row = 0
-        for key , page_class in icons:
+        for item in icons:
+            key = item[0]
+            page_class = item[1]
+            action = item[2] if len(item) > 2 else None
+            
             try:
                 path = AssetManager.get_icon_path(key)
                 image = ctk.CTkImage(
@@ -77,6 +90,15 @@ class DashBoardComponent(ctk.CTkFrame):
                     dark_image=Image.open(path),
                     size=(25, 25)  # chỉnh kích thước icon
                 )
+                
+                # Xác định command cho button
+                if action == "logout":
+                    cmd = self.handle_logout
+                elif page_class:
+                    cmd = lambda pc=page_class: self.show_content(pc)
+                else:
+                    cmd = None
+                
                 btn = ctk.CTkButton(
                     menu_bar,
                     image=image,
@@ -86,7 +108,7 @@ class DashBoardComponent(ctk.CTkFrame):
                     corner_radius=10,
                     fg_color="transparent",  # nền trong suốt
                     hover_color="#FE5858",
-                    command=lambda pc=page_class: self.show_content(pc) 
+                    command=cmd
                 )
                 btn.grid(row=row, column=0, pady=10, padx=10, sticky="nsew")
                 row += 1
@@ -153,6 +175,17 @@ class DashBoardComponent(ctk.CTkFrame):
         # Tạo và hiển thị nội dung mới
         content = content_class(self.layer2_DB)
         content.pack(fill="both", expand=True)
+    
+    # ========== HANDLE LOGOUT ==========
+    def handle_logout(self):
+        """Xử lý đăng xuất - quay về màn hình đăng nhập."""
+        # Confirm logout
+        from tkinter import messagebox
+        if messagebox.askyesno("Đăng xuất", "Bạn có chắc muốn đăng xuất?"):
+            if self.parent_window and hasattr(self.parent_window, 'logout'):
+                self.parent_window.logout()
+            else:
+                print("❌ Không thể đăng xuất: parent_window không có method logout()")
 
 
 

@@ -8,10 +8,19 @@ from gui.Components.Base_DB_Component import DashBoardComponent
 
 # ========== LOGIN FORM ==========
 class LoginFormUI(ctk.CTkFrame):
-    def __init__(self,master ,parent_component=None):
-        super().__init__(master, fg_color ="#F7F7F5")
+    def __init__(self, master, parent_component=None, parent_window=None):
+        """
+        Form đăng nhập (CTkFrame).
+        
+        Args:
+            master: Container frame
+            parent_component: SignInComponent instance (để gọi show_forgetpassword)
+            parent_window: Frame_DB instance (để gọi show_dashboard khi đăng nhập thành công)
+        """
+        super().__init__(master, fg_color="#F7F7F5")
         self.Login_Ctrl = LoginController()
-        self.parent_component = parent_component  # call show_forgetpassword()
+        self.parent_component = parent_component
+        self.parent_window = parent_window  # Reference đến Frame_DB
         self.pack(fill="both", expand=True)
 
         # ========== FORM CONTAINER ==========
@@ -127,56 +136,72 @@ class LoginFormUI(ctk.CTkFrame):
         return signin_button
 
     def handle_signin_click(self):
+        """
+        Xử lý sự kiện click nút đăng nhập.
+        View tự xử lý UI và chuyển giao diện dựa trên kết quả từ Controller.
+        """
+        # 1. Lấy thông tin đăng nhập từ UI
         username = self.username.get().strip() if hasattr(self, "username") else ""
         password = self.password.get().strip() if hasattr(self, "password") else ""
 
+        # 2. Validate input ở View layer
         if username in ["", "Nhập tên đăng nhập"] or password in ["", "Mật khẩu"]:
             tk.messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!")
             return
 
+        # 3. Gọi Controller để xử lý logic nghiệp vụ (chỉ API, không GUI)
         try:
-            # Không truyền widget/object vào controller để tránh vô tình gán
-            # đối tượng vào tham số màu hoặc cấu hình widget.
-            result = self.Login_Ctrl.login1(username, password)
+            status, data = self.Login_Ctrl.login1(username, password)
         except Exception as e:
             tk.messagebox.showerror("Lỗi", f"Lỗi khi gọi hàm đăng nhập: {e}")
             return
+
+        # 4. View tự quyết định cách hiển thị dựa trên kết quả
+        if status == "success":
+            # Đăng nhập thành công
+            print(f"✅ Đăng nhập thành công: {data}")
+            
+            # Lấy tên user từ data
+            user_name = username
+            if isinstance(data, dict) and "user" in data:
+                user_name = data["user"].get("username", username)
+            
+            tk.messagebox.showinfo("Đăng nhập thành công", f"Xin chào {user_name}!")
+            
+            # View tự quyết định chuyển giao diện
+            self._switch_to_dashboard()
+            
+        else:  # status == "error"
+            # Đăng nhập thất bại
+            print(f"❌ Đăng nhập thất bại: {data}")
+            tk.messagebox.showerror("Lỗi đăng nhập", str(data))
+
+    def _switch_to_dashboard(self):
+        """
+        Chuyển sang màn hình Dashboard.
         
-         # ✅ Nếu controller trả tuple (success, message)
-        if isinstance(result, tuple):
-            success, message = result
-        elif isinstance(result, dict):
-            success = result.get("success", False)
-            message = result.get("message", "")
-        else:
-            success, message = False, str(result)
-
-        # Xử lý kết quả đăng nhập
-        if success:
-            print(f"✅ Đăng nhập thành công: {message}")
-            tk.messagebox.showinfo("Đăng nhập thành công", f"Xin chào {username}!")
-
-            # Đóng cửa sổ SignIn hiện tại và mở một cửa sổ Dashboard mới.
-            try:
-                root = self.winfo_toplevel()
-                try:
-                    root.destroy()
-                except Exception:
-                    try:
-                        root.withdraw()
-                    except Exception:
-                        pass
-
-                # Khởi tạo và hiển thị DashboardForm mới (là một CTk root riêng)
-                from gui.Views.Dashboard import DashBoardForm
-                dashboard_window = DashBoardForm()
-                dashboard_window.mainloop()
-                print("✅ Chuyển sang giao diện chính thành công.")
-            except Exception as e:
-                print(f"❌ Lỗi khi mở DashBoardForm: {e}")
-        else:
-            print(f"❌ Đăng nhập thất bại: {message}")
-            tk.messagebox.showerror("Lỗi đăng nhập", message)
+        KIẾN TRÚC MỚI (CTkFrame-based):
+        - Không tạo window mới
+        - Gọi parent_window.show_dashboard() để swap frame
+        - Parent window (Frame_DB) sẽ xử lý việc ẩn SignIn và hiển thị Dashboard
+        
+        Ưu điểm:
+        - Chỉ 1 CTk root window (không bị lỗi pyimage)
+        - Swap frame nhanh, mượt
+        - Dễ quản lý state và logout
+        """
+        try:
+            if self.parent_window and hasattr(self.parent_window, 'show_dashboard'):
+                print("🔄 Chuyển sang Dashboard...")
+                self.parent_window.show_dashboard()
+            else:
+                raise Exception("parent_window không có method show_dashboard()")
+                
+        except Exception as e:
+            print(f"❌ Lỗi khi chuyển sang Dashboard: {e}")
+            import traceback
+            traceback.print_exc()
+            tk.messagebox.showerror("Lỗi", f"Không thể chuyển sang giao diện chính: {e}")
 
     # ========== BUTTON GMAIL ==========
     def button_gmail_fr_signin(self, form_signin):

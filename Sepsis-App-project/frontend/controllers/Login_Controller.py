@@ -1,5 +1,4 @@
 from ast import pattern
-from tkinter import messagebox
 import customtkinter as ctk
 import tkinter as tk
 import requests
@@ -118,71 +117,49 @@ class LoginController():
         label.bind("<Leave>", on_leave)
 
     # ========== HANDLE SIGN IN BUTTON CLICK ==========
-    
-    def login(self, username, password, on_success=None):
-        if not username or not password:
-            messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
-            return
-
-        try:
-            url = f"{self.api_url}/auth/login"
-            payload = {"username": username, "password": password}
-            response = requests.post(url, json=payload)
-
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Nếu login thành công -> hiện thông báo và chuyển trang
-                messagebox.showinfo("Đăng nhập", "Đăng nhập thành công!")
-                
-                if on_success:  # Gọi callback để chuyển sang trang Home
-                    on_success()
-                return True
-            else:
-                data = response.json()
-                messagebox.showerror("Lỗi", data.get('detail', 'Đăng nhập thất bại!'))
-                return False
-        except Exception as e:
-            messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")
-            return False
-
     # ========== login_API ==========
-    def login1(self, username, password, current_window=None):
+    def login1(self, username, password):
+        """
+        Controller xử lý logic nghiệp vụ đăng nhập (GỌI API).
+        Không xử lý GUI, chỉ trả về kết quả để View tự quyết định hiển thị.
+        
+        Args:
+            username (str): Tên đăng nhập
+            password (str): Mật khẩu
+            
+        Returns:
+            tuple: (status, data)
+                - status: "success" hoặc "error"
+                - data: dict chứa thông tin user (nếu thành công) hoặc message lỗi (nếu thất bại)
+        """
+        # 1. Validate input ở Controller layer (business logic)
         if not username or not password:
-            messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
-            return "error" , "Thiếu thông tin"
+            return "error", "Thiếu thông tin đăng nhập"
 
+        # 2. Gọi API login
         try:
-            # Gọi API login ở BE (http://localhost:5000/api/auth/login)
             url = f"{self.api_url}/auth/login"
             payload = {"username": username, "password": password}
-            response = requests.post(url, json=payload , timeout=self.timeout)
+            response = requests.post(url, json=payload, timeout=self.timeout)
 
             data = response.json()
             print("Response from login API:", data)
 
+            # 3. Xử lý response và trả về kết quả (KHÔNG hiển thị messagebox)
             if response.status_code == 200 and data.get("success") == True:
-                messagebox.showinfo("Đăng nhập thành công", f"Xin chào {data['user']['username']}!")
-                
-                try:
-                    current_window.withdraw()
-                except Exception as e:
-                    print("Không thể destroy window:", e)
-
-                # ✅ Đóng cửa sổ đăng nhập
-                from gui.Views.Dashboard import DashBoardForm
-                # ✅ Mở DashboardForm
-                dashboard = DashBoardForm(current_window)
-                dashboard.grab_set()
-
-                return "success", data 
+                return "success", data
             else:
-                messagebox.showerror("Lỗi đăng nhập", f"Đăng nhập thất bại: {data.get('message', 'Sai thông tin đăng nhập')}")
-                return "error", data.get("message", "Sai thông tin đăng nhập")
+                error_message = data.get('message', 'Sai thông tin đăng nhập')
+                return "error", error_message
             
+        except requests.exceptions.Timeout:
+            return "error", f"Timeout: Không thể kết nối tới server sau {self.timeout}s"
+        
+        except requests.exceptions.ConnectionError:
+            return "error", "Không thể kết nối tới API backend. Vui lòng kiểm tra server."
+        
         except Exception as e:
-            messagebox.showerror("Lỗi kết nối", f"Không thể kết nối tới API backend.\n{e}")
-            return "error", str(e)
+            return "error", f"Lỗi không xác định: {str(e)}"
 
 
 

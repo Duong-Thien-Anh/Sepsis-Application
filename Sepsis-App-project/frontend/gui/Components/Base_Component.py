@@ -7,10 +7,20 @@ from gui.Components.Login_Component import LoginFormUI
 
 # ========== SIGN IN COMPONENT ==========
 class SignInComponent(ctk.CTkFrame):
-    def __init__(self, master,controller):
+    def __init__(self, master, controller, parent_window=None):
+        """
+        Component đăng nhập (CTkFrame).
+        
+        Args:
+            master: Container frame
+            controller: LoginController instance
+            parent_window: Frame_DB instance để gọi show_dashboard()
+        """
         super().__init__(master)
 
         self.controller = controller
+        self.parent_window = parent_window  # Reference đến Frame_DB
+        
         outer = self.outer_fr_signin()
         container = self.container_fr_signin(outer)
 
@@ -98,8 +108,10 @@ class SignInComponent(ctk.CTkFrame):
     def show_signin_form(self):
         self.clear_layer2()
         self.current_form = LoginFormUI(
-            self.layer2, parent_component=self
-        )  # truyền parent để gọi switch
+            self.layer2, 
+            parent_component=self,
+            parent_window=self.parent_window  # Truyền parent_window xuống LoginFormUI
+        )
         self.current_form.pack(expand=True, fill="both")
 
     def show_forgetpassword_form(self):
