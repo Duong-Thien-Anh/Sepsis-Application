@@ -2,7 +2,8 @@ import customtkinter as ctk
 import tkinter as tk
 from PIL import Image
 from controllers.ForgetPassword_Controller import ForgetPasswordController
-from controllers.Login_Controller import LoginController
+from controllers.Login_Controller import LoginController 
+
 
 # ========== FORGET PASSWORD FORM ==========
 class ForgetPasswordFormUI(ctk.CTkFrame):
@@ -59,8 +60,17 @@ class ForgetPasswordFormUI(ctk.CTkFrame):
             cursor="hand2"
         )
         back_to_signin_label.pack(pady=(10, 0))
-        self.SignIn_Ctrl.hover_effect_label_forget_password(back_to_signin_label)
-        back_to_signin_label.bind("<Button-1>", lambda e: self.parent_component.show_signin_form())
+        self.Login_Ctrl.hover_effect_label_forget_password(back_to_signin_label)
+        def on_click(event=None):
+            try:
+                if self.parent_component and hasattr(self.parent_component, "show_signin_form"):
+                    self.parent_component.show_signin_form()
+                else:
+                    print("No parent_component or show_signin_form not found")
+            except Exception as e:
+                print("Error switching to sign in form:", e)
+
+        back_to_signin_label.bind("<Button-1>", on_click)
         return back_to_signin_label
 
     # ========== FORGET PASSWORD  INPUT==========

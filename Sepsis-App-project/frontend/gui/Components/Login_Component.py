@@ -4,7 +4,6 @@ import tkinter as tk
 from PIL import Image
 from controllers.Login_Controller import LoginController
 from assets.Assets_Management import AssetManager
-from gui.Components.Base_DB_Component import DashBoardComponent
 
 # ========== LOGIN FORM ==========
 class LoginFormUI(ctk.CTkFrame):
@@ -177,19 +176,6 @@ class LoginFormUI(ctk.CTkFrame):
             tk.messagebox.showerror("Lỗi đăng nhập", str(data))
 
     def _switch_to_dashboard(self):
-        """
-        Chuyển sang màn hình Dashboard.
-        
-        KIẾN TRÚC MỚI (CTkFrame-based):
-        - Không tạo window mới
-        - Gọi parent_window.show_dashboard() để swap frame
-        - Parent window (Frame_DB) sẽ xử lý việc ẩn SignIn và hiển thị Dashboard
-        
-        Ưu điểm:
-        - Chỉ 1 CTk root window (không bị lỗi pyimage)
-        - Swap frame nhanh, mượt
-        - Dễ quản lý state và logout
-        """
         try:
             if self.parent_window and hasattr(self.parent_window, 'show_dashboard'):
                 print("🔄 Chuyển sang Dashboard...")

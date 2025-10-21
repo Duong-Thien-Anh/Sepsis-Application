@@ -8,14 +8,6 @@ from gui.Components.Login_Component import LoginFormUI
 # ========== SIGN IN COMPONENT ==========
 class SignInComponent(ctk.CTkFrame):
     def __init__(self, master, controller, parent_window=None):
-        """
-        Component đăng nhập (CTkFrame).
-        
-        Args:
-            master: Container frame
-            controller: LoginController instance
-            parent_window: Frame_DB instance để gọi show_dashboard()
-        """
         super().__init__(master)
 
         self.controller = controller
