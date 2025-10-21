@@ -8,14 +8,6 @@ from assets.Assets_Management import AssetManager
 # ========== LOGIN FORM ==========
 class LoginFormUI(ctk.CTkFrame):
     def __init__(self, master, parent_component=None, parent_window=None):
-        """
-        Form đăng nhập (CTkFrame).
-        
-        Args:
-            master: Container frame
-            parent_component: SignInComponent instance (để gọi show_forgetpassword)
-            parent_window: Frame_DB instance (để gọi show_dashboard khi đăng nhập thành công)
-        """
         super().__init__(master, fg_color="#F7F7F5")
         self.Login_Ctrl = LoginController()
         self.parent_component = parent_component

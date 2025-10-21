@@ -3,15 +3,6 @@ from gui.Components.Base_Component import SignInComponent
 from gui.Components.Base_DB_Component import DashBoardComponent
 
 class Windows_DB(ctk.CTk):
-    """
-    Cửa sổ chính của ứng dụng (CTk root window).
-    Quản lý việc chuyển đổi giữa các màn hình (CTkFrame components).
-    
-    Flow:
-    1. Khởi tạo → Hiển thị SignInComponent (đăng nhập)
-    2. Đăng nhập thành công → Chuyển sang DashBoardComponent
-    3. Logout → Quay lại SignInComponent
-    """
     def __init__(self, master=None):
         super().__init__(master)
         
@@ -36,7 +27,8 @@ class Windows_DB(ctk.CTk):
         
         # Hiển thị màn hình đăng nhập đầu tiên
         # self.show_signin()
-        self.show_dashboard() # Mặc định hiển thị Dashboard để tiện phát triển
+        """Mặc định hiển thị Dashboard để tiện phát triển."""
+        self.show_dashboard() 
 
     def show_signin(self):
         """Hiển thị màn hình đăng nhập (SignInComponent)."""
