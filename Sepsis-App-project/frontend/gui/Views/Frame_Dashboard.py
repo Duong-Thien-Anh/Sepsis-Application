@@ -58,8 +58,8 @@ class Frame_DB(ctk.CTk):
         self.current_component = self.signin_component
         
         # Resize window cho phù hợp với SignIn
-        self.geometry("862x500")
-        self.center_desktop(862, 500)
+        self.geometry("1062x600")
+        self.center_desktop(1062, 600)
         self.title("Đăng nhập hệ thống")
         print("✅ Đang hiển thị màn hình đăng nhập")
 

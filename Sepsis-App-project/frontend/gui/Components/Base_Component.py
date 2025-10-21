@@ -13,6 +13,10 @@ class SignInComponent(ctk.CTkFrame):
         self.controller = controller
         self.parent_window = parent_window  # Reference đến Frame_DB
         
+        self.pack(fill="both", expand=True)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+
         outer = self.outer_fr_signin()
         container = self.container_fr_signin(outer)
 
@@ -38,7 +42,7 @@ class SignInComponent(ctk.CTkFrame):
         return outer
 
     # ========== CONTAINER ================
-    def container_fr_signin(self, outer , w=822, h=460):
+    def container_fr_signin(self, outer , w = 1062, h = 600):
         # Container (CTkFrame)
         container = ctk.CTkFrame(
             outer,

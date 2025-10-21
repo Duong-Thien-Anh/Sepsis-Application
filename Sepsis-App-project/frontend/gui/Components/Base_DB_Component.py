@@ -9,13 +9,6 @@ from gui.Components.Ai_Component import AI_UI
 # ========== DASHBOARD COMPONENT ==========
 class DashBoardComponent(ctk.CTkFrame):
     def __init__(self, master, parent_window=None):
-        """
-        Component Dashboard chính (CTkFrame).
-        
-        Args:
-            master: Container frame
-            parent_window: Frame_DB instance (để gọi logout())
-        """
         super().__init__(master)
         
         self.parent_window = parent_window  # Reference để logout
