@@ -2,7 +2,7 @@ import customtkinter as ctk
 from gui.Components.Base_Component import SignInComponent
 from gui.Components.Base_DB_Component import DashBoardComponent
 
-class Frame_DB(ctk.CTk):
+class Windows_DB(ctk.CTk):
     """
     Cửa sổ chính của ứng dụng (CTk root window).
     Quản lý việc chuyển đổi giữa các màn hình (CTkFrame components).
@@ -35,12 +35,13 @@ class Frame_DB(ctk.CTk):
         self.dashboard_component = None
         
         # Hiển thị màn hình đăng nhập đầu tiên
-        self.show_signin()
+        # self.show_signin()
+        self.show_dashboard() # Mặc định hiển thị Dashboard để tiện phát triển
 
     def show_signin(self):
         """Hiển thị màn hình đăng nhập (SignInComponent)."""
-        # Ẩn component hiện tại
-        if self.current_component:
+        # Ẩn component hiện tại (kiểm tra còn tồn tại trước)
+        if self.current_component and self.current_component.winfo_exists():
             self.current_component.grid_forget()
         
         # Tạo SignInComponent nếu chưa có (hoặc reuse nếu đã có)
@@ -65,8 +66,8 @@ class Frame_DB(ctk.CTk):
 
     def show_dashboard(self):
         """Hiển thị màn hình chính (DashBoardComponent) sau khi đăng nhập thành công."""
-        # Ẩn SignIn component
-        if self.current_component:
+        # Ẩn SignIn component (kiểm tra còn tồn tại trước)
+        if self.current_component and self.current_component.winfo_exists():
             self.current_component.grid_forget()
         
         # Hủy SignIn component để giải phóng bộ nhớ (optional)
@@ -93,14 +94,15 @@ class Frame_DB(ctk.CTk):
 
     def logout(self):
         """Đăng xuất - quay về màn hình đăng nhập."""
-        # Ẩn Dashboard component
-        if self.current_component:
+        # Ẩn Dashboard component (kiểm tra còn tồn tại trước)
+        if self.current_component and self.current_component.winfo_exists():
             self.current_component.grid_forget()
         
-        # Hủy Dashboard để giải phóng bộ nhớ (optional)
-        if self.dashboard_component:
+        # Hủy Dashboard để giải phóng bộ nhớ
+        if self.dashboard_component and self.dashboard_component.winfo_exists():
             self.dashboard_component.destroy()
-            self.dashboard_component = None
+        self.dashboard_component = None
+        self.current_component = None  # Reset current component
         
         # Hiển thị lại SignIn
         self.show_signin()

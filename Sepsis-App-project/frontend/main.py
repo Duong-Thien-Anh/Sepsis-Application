@@ -1,13 +1,13 @@
 # main.py
-from gui.Views.Frame_Dashboard import Frame_DB
+from gui.Views.Windows_Dashboard import Windows_DB
 
 class MainApp:
     def __init__(self):
         """
         Khởi tạo ứng dụng chính.
-        Frame_DB là cửa sổ chính (CTk root window) chứa các component (CTkFrame).
+        Windows_DB là cửa sổ chính (CTk root window) chứa các component (CTkFrame).
         """
-        self.root = Frame_DB()
+        self.root = Windows_DB()
 
     def run(self):
         """Start and return the GUI root and this MainApp instance."""

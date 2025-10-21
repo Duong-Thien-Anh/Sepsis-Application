@@ -25,7 +25,6 @@ class SignInComponent(ctk.CTkFrame):
 
         self.show_signin_form()
 
-
     # ========== OUTER =====================
     def outer_fr_signin(self):
     # Outer frame to provide a black border for the window
@@ -42,12 +41,10 @@ class SignInComponent(ctk.CTkFrame):
         return outer
 
     # ========== CONTAINER ================
-    def container_fr_signin(self, outer , w = 1062, h = 600):
+    def container_fr_signin(self, outer ):
         # Container (CTkFrame)
         container = ctk.CTkFrame(
             outer,
-            width=w,
-            height=h,
             fg_color="#F7F7F5",   
             corner_radius=15,
             border_color="#000000",

@@ -60,7 +60,7 @@ class DashBoardComponent(ctk.CTkFrame):
         menu_bar.grid_columnconfigure(0, weight=1) 
 
         icons = [
-            ("btn_Menu", HomeUI, None),
+            ("btn_Menu", HomeUI, "Home"),
             ("btn_Ai", AI_UI, None),
             ("btn_Patient", HomeUI, None),
             ("btn_Employee", HomeUI, None),
@@ -86,6 +86,8 @@ class DashBoardComponent(ctk.CTkFrame):
                 
                 # Xác định command cho button
                 if action == "logout":
+                    # Debug: in ra khi tạo button logout
+                    print(f"🔧 Tạo nút logout, parent_window = {self.parent_window}")
                     cmd = self.handle_logout
                 elif page_class:
                     cmd = lambda pc=page_class: self.show_content(pc)
@@ -172,13 +174,21 @@ class DashBoardComponent(ctk.CTkFrame):
     # ========== HANDLE LOGOUT ==========
     def handle_logout(self):
         """Xử lý đăng xuất - quay về màn hình đăng nhập."""
+        print("🔔 handle_logout() được gọi!")
+        print(f"   parent_window = {self.parent_window}")
+        print(f"   has logout method? {hasattr(self.parent_window, 'logout') if self.parent_window else 'No parent_window'}")
+        
         # Confirm logout
         from tkinter import messagebox
         if messagebox.askyesno("Đăng xuất", "Bạn có chắc muốn đăng xuất?"):
+            print("✅ User xác nhận đăng xuất")
             if self.parent_window and hasattr(self.parent_window, 'logout'):
+                print("🔄 Đang gọi parent_window.logout()...")
                 self.parent_window.logout()
             else:
                 print("❌ Không thể đăng xuất: parent_window không có method logout()")
+        else:
+            print("❌ User hủy đăng xuất")
 
 
 

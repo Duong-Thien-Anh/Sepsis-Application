@@ -51,13 +51,13 @@ class HomeUI(ctk.CTkFrame):
 
         # ========== Label tiêu đề ==========
 
-        title = ctk.CTkLabel(frame, text="Số lượng bệnh nhân trong tháng", font=ctk.CTkFont(size=14, weight="bold") , anchor="w", justify="left" , wraplength=100  )
+        title = ctk.CTkLabel(frame,  text="Số lượng bệnh nhân trong tháng",text_color="black", font=ctk.CTkFont(size=14, weight="bold") , anchor="w", justify="left" , wraplength=100  )
         title.grid(row=0, column=0, padx=0, pady=10, sticky="ns")
 
-        title = ctk.CTkLabel(frame, text="Tháng", font=ctk.CTkFont(size=14, weight="bold"), justify="left" , wraplength=100  )
+        title = ctk.CTkLabel(frame, text="Tháng", text_color="black", font=ctk.CTkFont(size=14, weight="bold"), justify="left" , wraplength=100  )
         title.grid(row=0, column=2, padx=0, pady=10, sticky="ns")
 
-        title = ctk.CTkLabel(frame, text="Năm", font=ctk.CTkFont(size=14, weight="bold"), justify="left" , wraplength=100  )
+        title = ctk.CTkLabel(frame, text="Năm", text_color="black", font=ctk.CTkFont(size=14, weight="bold"), justify="left" , wraplength=100  )
         title.grid(row=0, column=4, padx=0, pady=10, sticky="ns")
 
         # # ========== Ô số bệnh nhân ==========
