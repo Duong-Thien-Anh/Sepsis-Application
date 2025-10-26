@@ -5,6 +5,7 @@ from assets.Assets_Management import AssetManager
 from gui.Components.Header_Component import HeaderFormUI
 from gui.Components.Home_Component import HomeUI
 from gui.Components.Ai_Component import AI_UI
+from gui.Components.Patient_Component import Patient_UI
 
 # ========== DASHBOARD COMPONENT ==========
 class DashBoardComponent(ctk.CTkFrame):
@@ -62,7 +63,7 @@ class DashBoardComponent(ctk.CTkFrame):
         icons = [
             ("btn_Menu", HomeUI, "Home"),
             ("btn_Ai", AI_UI, None),
-            ("btn_Patient", HomeUI, None),
+            ("btn_Patient", Patient_UI, None),
             ("btn_Employee", HomeUI, None),
             ("btn_Account", HomeUI, None),
             ("btn_Recall_Appointment", HomeUI, None),

@@ -313,13 +313,13 @@ class AI_UI(ctk.CTkFrame):
         
         # Nút xóa
         self.button_clear = ctk.CTkButton(
-            button_frame,
+            button_frame, 
             text="Xóa",
             font=ctk.CTkFont(size=12, weight="bold"),
             width=100,
             height=35,
-            fg_color="#ED5C5C",
-            hover_color="#c44a4a",
+            fg_color="#ED5C5C", 
+            hover_color="#45a049",
             border_width=2,
             border_color="black",
             corner_radius=10
