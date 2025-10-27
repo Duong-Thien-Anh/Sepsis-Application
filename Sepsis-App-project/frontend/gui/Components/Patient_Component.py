@@ -119,12 +119,12 @@ class Patient_UI(ctk.CTkFrame):
                 text="🔍",
                 width=40,
                 height=40,
-                corner_radius=5,
+                corner_radius=10,
                 fg_color="#66B7FF",
                 hover_color="#45a049",
                 border_width=2,
                 border_color="black",
-                font=ctk.CTkFont(size=14),
+                font=ctk.CTkFont(size=20, weight="bold"),
                 command=self.on_search_click
             )
         
@@ -147,12 +147,12 @@ class Patient_UI(ctk.CTkFrame):
             text="+",
             width=40,
             height=40,
-            corner_radius=5,
-            fg_color="#4CAF50",
-            hover_color="#F7EA4F",
+            corner_radius=10,
+            fg_color="#66B7FF",
+            hover_color="#45a049",
             border_width=2,
             border_color="black",
-            font=ctk.CTkFont(size=20, weight="bold"),
+            font=ctk.CTkFont(size=30, weight="bold" , family="Roboto"),
             command=self.on_add_patient
         )
         self.add_button.pack(side="left", padx=5)
@@ -163,29 +163,29 @@ class Patient_UI(ctk.CTkFrame):
             text="-",
             width=40,
             height=40,
-            corner_radius=5,
-            fg_color="#F44336",
-            hover_color="#F7EA4F",
+            corner_radius=10,
+            fg_color="#66B7FF",
+            hover_color="#45a049",
             border_width=2,
             border_color="black",
-            font=ctk.CTkFont(size=20, weight="bold"),
+            font=ctk.CTkFont(size=30, weight="bold" , family="Roboto"),
             command=self.on_delete_patient
         )
         self.delete_button.pack(side="left", padx=5)
 
     def create_patient_table(self):
         """Tạo table hiển thị danh sách bệnh nhân với scrollbar."""
-        # Thêm viền cho frame bảng
-        table_frame = ctk.CTkFrame(self, fg_color="white", border_width=2, border_color="black", corner_radius=10)
+        # Frame ngoài với viền và bo góc
+        table_frame = ctk.CTkFrame(self, fg_color="white", border_width=2, border_color="black", corner_radius=15)
         table_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=(5,10))
         
         # Cấu hình grid
         table_frame.grid_rowconfigure(0, weight=1)
         table_frame.grid_columnconfigure(0, weight=1)
         
-        # Tạo Treeview với scrollbar
-        tree_container = ctk.CTkFrame(table_frame, fg_color="white")
-        tree_container.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        # Container bên trong với bo góc và clip content
+        tree_container = ctk.CTkFrame(table_frame, fg_color="white", corner_radius=15)
+        tree_container.grid(row=0, column=0, sticky="nsew", padx=8, pady=8)
         tree_container.grid_rowconfigure(0, weight=1)
         tree_container.grid_columnconfigure(0, weight=1)
         
@@ -254,7 +254,6 @@ class Patient_UI(ctk.CTkFrame):
             background="#66B7FF",
             foreground="white",
             font=("Roboto", 12, "bold"),
-            borderwidth=1,      # Chỉ giữ 1px
             relief="flat"       # Flat style
         )
         
@@ -273,14 +272,26 @@ class Patient_UI(ctk.CTkFrame):
         
         # Thêm dữ liệu mẫu - Thêm text "Xem chi tiết" vào cột cuối
         sample_data = [
-            ("1", "BN001", "Nguyễn Văn A", "01/01/1990", "Nam", "0901234567", "nguyenvana@email.com", "📋 Xem chi tiết"),
-            ("2", "BN002", "Trần Thị B", "15/05/1985", "Nữ", "0912345678", "tranthib@email.com", "📋 Xem chi tiết"),
-            ("3", "BN003", "Lê Văn C", "20/08/1992", "Nam", "0923456789", "levanc@email.com", "📋 Xem chi tiết"),
-            ("4", "BN004", "Phạm Thị D", "10/12/1988", "Nữ", "0934567890", "phamthid@email.com", "📋 Xem chi tiết"),
-            ("5", "BN005", "Hoàng Văn E", "25/03/1995", "Nam", "0945678901", "hoangvane@email.com", "📋 Xem chi tiết"),
-            ("6", "BN006", "Võ Thị F", "12/07/1993", "Nữ", "0956789012", "vothif@email.com", "📋 Xem chi tiết"),
-            ("7", "BN007", "Đặng Văn G", "30/11/1987", "Nam", "0967890123", "dangvang@email.com", "📋 Xem chi tiết"),
-            ("8", "BN008", "Mai Thị H", "18/02/1991", "Nữ", "0978901234", "maithih@email.com", "📋 Xem chi tiết"),
+                ("1", "BN001", "Nguyễn Văn A", "01/01/1990", "Nam", "0901234567", "nguyenvana@email.com", "📋 Xem chi tiết"),
+                ("2", "BN002", "Trần Thị B", "15/05/1985", "Nữ", "0912345678", "tranthib@email.com", "📋 Xem chi tiết"),
+                ("3", "BN003", "Lê Văn C", "20/08/1992", "Nam", "0923456789", "levanc@email.com", "📋 Xem chi tiết"),
+                ("4", "BN004", "Phạm Thị D", "10/12/1988", "Nữ", "0934567890", "phamthid@email.com", "📋 Xem chi tiết"),
+                ("5", "BN005", "Hoàng Văn E", "25/03/1995", "Nam", "0945678901", "hoangvane@email.com", "📋 Xem chi tiết"),
+                ("6", "BN006", "Võ Thị F", "12/07/1993", "Nữ", "0956789012", "vothif@email.com", "📋 Xem chi tiết"),
+                ("7", "BN007", "Đặng Văn G", "30/11/1987", "Nam", "0967890123", "dangvang@email.com", "📋 Xem chi tiết"),
+                ("8", "BN008", "Mai Thị H", "18/02/1991", "Nữ", "0978901234", "maithih@email.com", "📋 Xem chi tiết"),
+                ("9", "BN009", "Ngô Văn I", "09/09/1989", "Nam", "0989012345", "ngovani@email.com", "📋 Xem chi tiết"),
+                ("10", "BN010", "Lý Thị K", "05/06/1994", "Nữ", "0990123456", "lythik@email.com", "📋 Xem chi tiết"),
+                ("11", "BN011", "Tạ Văn L", "14/04/1990", "Nam", "0902345678", "tavanl@email.com", "📋 Xem chi tiết"),
+                ("12", "BN012", "Phan Thị M", "22/08/1992", "Nữ", "0913456789", "phanthim@email.com", "📋 Xem chi tiết"),
+                ("13", "BN013", "Đỗ Văn N", "30/10/1986", "Nam", "0924567890", "dovann@email.com", "📋 Xem chi tiết"),
+                ("14", "BN014", "Nguyễn Thị O", "08/03/1991", "Nữ", "0935678901", "nguyenthio@email.com", "📋 Xem chi tiết"),
+                ("15", "BN015", "Bùi Văn P", "27/11/1993", "Nam", "0946789012", "buivanp@email.com", "📋 Xem chi tiết"),
+                ("16", "BN016", "Trịnh Thị Q", "19/07/1990", "Nữ", "0957890123", "trinhthiq@email.com", "📋 Xem chi tiết"),
+                ("17", "BN017", "Nguyễn Văn R", "02/02/1988", "Nam", "0968901234", "nguyenvanr@email.com", "📋 Xem chi tiết"),
+                ("18", "BN018", "Lâm Thị S", "23/09/1995", "Nữ", "0979012345", "lamthis@email.com", "📋 Xem chi tiết"),
+                ("19", "BN019", "Phùng Văn T", "17/05/1992", "Nam", "0980123456", "phungvant@email.com", "📋 Xem chi tiết"),
+                ("20", "BN020", "Đoàn Thị U", "04/12/1989", "Nữ", "0991234567", "doanthiu@email.com", "📋 Xem chi tiết"),
         ]
         
         for data in sample_data:
