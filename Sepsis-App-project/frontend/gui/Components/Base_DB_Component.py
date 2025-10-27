@@ -52,13 +52,9 @@ class DashBoardComponent(ctk.CTkFrame):
             width=min_w,
             fg_color="#66B7FF",   
             corner_radius=15,
-            # border_color="#000000",
-            # border_width=2,
         )
         menu_bar.grid(row=0, column=0, sticky="nsew",padx=(20,0), pady=20)
         menu_bar.grid_propagate(False)
-        menu_bar.grid_rowconfigure(0, weight=1)  
-        menu_bar.grid_columnconfigure(0, weight=1) 
 
         icons = [
             ("btn_Menu", HomeUI, "Home"),
@@ -68,8 +64,14 @@ class DashBoardComponent(ctk.CTkFrame):
             ("btn_Account", HomeUI, None),
             ("btn_Recall_Appointment", HomeUI, None),
             ("btn_setting", HomeUI, None),
-            ("btn_Sign_Out", None, "logout")  # Special: logout action
+            ("btn_Sign_Out", None, "logout")
         ]
+
+        # Cấu hình grid để icons phân bố đều
+        total_icons = len(icons)
+        for i in range(total_icons):
+            menu_bar.grid_rowconfigure(i, weight=1, uniform="icon")  # uniform="icon" để đồng đều
+        menu_bar.grid_columnconfigure(0, weight=1)
 
         row = 0
         for item in icons:
@@ -82,12 +84,11 @@ class DashBoardComponent(ctk.CTkFrame):
                 image = ctk.CTkImage(
                     light_image=Image.open(path),
                     dark_image=Image.open(path),
-                    size=(25, 25)  # chỉnh kích thước icon
+                    size=(25, 25)
                 )
                 
                 # Xác định command cho button
                 if action == "logout":
-                    # Debug: in ra khi tạo button logout
                     print(f"🔧 Tạo nút logout, parent_window = {self.parent_window}")
                     cmd = self.handle_logout
                 elif page_class:
@@ -98,15 +99,16 @@ class DashBoardComponent(ctk.CTkFrame):
                 btn = ctk.CTkButton(
                     menu_bar,
                     image=image,
-                    text="",  # chỉ hiển thị icon, bỏ chữ
+                    text="",
                     width=40,
                     height=50,
                     corner_radius=10,
-                    fg_color="transparent",  # nền trong suốt
+                    fg_color="transparent",
                     hover_color="#FE5858",
                     command=cmd
                 )
-                btn.grid(row=row, column=0, pady=10, padx=10, sticky="nsew")
+                # Bỏ pady cố định, để grid tự động phân bố đều
+                btn.grid(row=row, column=0, padx=10, sticky="")
                 row += 1
 
             except Exception as e:
@@ -163,12 +165,29 @@ class DashBoardComponent(ctk.CTkFrame):
         return layer2_DB
 
     # ========== SHOW CONTENT ==========
-    def show_content(self,content_class):
+    def show_content(self, content_class):
+        """
+        Hiển thị nội dung mới trong layer2.
+        Tối ưu: Chỉ destroy và tạo lại khi thực sự cần thiết.
+        """
+        # Kiểm tra xem đã có instance của class này chưa
+        current_widget = None
+        for widget in self.layer2_DB.winfo_children():
+            if isinstance(widget, content_class):
+                current_widget = widget
+                break
+        
+        # Nếu đã có instance, không cần tạo lại (tránh load lại)
+        if current_widget:
+            print(f"♻️ Đã có instance của {content_class.__name__}, không tạo lại")
+            return
+        
         # Xoá nội dung hiện tại trong layer2
         for widget in self.layer2_DB.winfo_children():
             widget.destroy()
 
         # Tạo và hiển thị nội dung mới
+        print(f"✨ Tạo mới instance của {content_class.__name__}")
         content = content_class(self.layer2_DB)
         content.pack(fill="both", expand=True)
     

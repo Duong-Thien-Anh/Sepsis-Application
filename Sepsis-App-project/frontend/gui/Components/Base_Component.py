@@ -48,7 +48,7 @@ class SignInComponent(ctk.CTkFrame):
             fg_color="#F7F7F5",   
             corner_radius=15,
             border_color="#000000",
-            border_width=3,
+            border_width=2,  # Giảm từ 3 xuống 2 để mỏng và liền mạch hơn
         )
         container.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
         container.grid_propagate(False)
@@ -64,7 +64,7 @@ class SignInComponent(ctk.CTkFrame):
             container,
             fg_color="#F7F7F5",
         )
-        layer1.grid(row=0, column=0, sticky="nsew", padx=(10,0), pady=(10,0)) 
+        layer1.grid(row=0, column=0, sticky="nsew", padx=(10,0), pady=10)  # Thêm pady đều để có viền dưới
         layer1.grid_propagate(False)
         layer1.pack_propagate(False)
 

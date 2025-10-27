@@ -4,7 +4,7 @@ from PIL import Image , ImageTk , ImageDraw, ImageOps
 import requests
 from controllers.Home_Controller import HomeController
 from assets.Assets_Management import AssetManager
-from services.api.api_urls import API_ROUTES
+
 
 
 class HomeUI(ctk.CTkFrame):
@@ -12,56 +12,14 @@ class HomeUI(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent" , corner_radius=15)
         self.Home_Ctrl = HomeController()
         self.pack(fill="both", expand=True)
+        
+        # Flag để tránh load nhiều lần
+        self._data_loaded = False
 
         self.grid_rowconfigure(0, weight=7)
         self.grid_rowconfigure(1, weight=3)
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
-
-        # # Frame 1: Biểu đồ cột
-        # self.frame_bar = ctk.CTkFrame(self, fg_color="white", border_width=2, border_color="black", corner_radius=10)
-        # self.frame_bar.grid(row=0, column=0, sticky="nsew", padx=(10,0), pady=10)
-        # self.frame_bar.grid_rowconfigure(0, weight=1)
-        # self.frame_bar.grid_columnconfigure(0, weight=1)
-
-        # # Frame 2: Biểu đồ tròn
-        # self.frame_pie = ctk.CTkFrame(self, fg_color="white", border_width=2, border_color="black", corner_radius=10)
-        # self.frame_pie.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
-        # self.frame_pie.grid_rowconfigure(0, weight=1)
-        # self.frame_pie.grid_columnconfigure(0, weight=1)
-
-        # # # Hiển thị biểu đồ
-        # self.Home_Ctrl.show_bar_chart(self.frame_bar)
-        # self.Home_Ctrl.show_pie_chart(self.frame_pie)
-        
-        # # Frame 3: Số bệnh nhân trong tháng và nút Reload
-        # # self.number_of_patient_in_month(self)
-        # # self.button_reload(self)
-        # # Frame 3: Thống kê bệnh nhân trong tháng + Reload
-        # self.frame_info = ctk.CTkFrame(self, fg_color="#f8f9fa", border_width=2, border_color="#ccc", corner_radius=10)
-        # self.frame_info.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=10, pady=(0, 10))
-
-        # self.label_patient_count = ctk.CTkLabel(
-        #     self.frame_info,
-        #     text="Đang tải dữ liệu...",
-        #     font=ctk.CTkFont(size=18, weight="bold"),
-        #     text_color="#212529"
-        # )
-        # self.label_patient_count.pack(side="left", padx=20, pady=20)
-
-        # self.reload_button = ctk.CTkButton(
-        #     self.frame_info,
-        #     text="🔄 Tải lại",
-        #     width=100,
-        #     fg_color="#007bff",
-        #     hover_color="#0056b3",
-        #     command=self.reload_data
-        # )
-        # self.reload_button.pack(side="right", padx=20, pady=20)
-
-        # # Hiển thị biểu đồ ban đầu
-        # self.reload_data()
-        
         
         # ============ FRAME 1: Biểu đồ cột (Nhóm tuổi) ============ #
         self.frame_bar = ctk.CTkFrame(
@@ -91,29 +49,42 @@ class HomeUI(ctk.CTkFrame):
         # Label hiển thị số bệnh nhân
         self.label_patient_count = ctk.CTkLabel(
             self.frame_info,
-            text="Đang tải dữ liệu...",
+            text="⏳ Đang tải dữ liệu...",
             font=ctk.CTkFont(size=18, weight="bold"),
             text_color="#212529"
         )
         self.label_patient_count.pack(side="left", padx=20, pady=20)
 
         # Nút Reload
+        # ========== BUTTON RELOAD ==============
+
         self.reload_button = ctk.CTkButton(
             self.frame_info,
             text="🔄 Tải lại",
             width=120,
+            height=40,
+            border_width=2,
+            border_color="black",
+            corner_radius=30, 
             fg_color="#007bff",
-            hover_color="#0056b3",
+            hover_color="#45A049",
             font=ctk.CTkFont(size=14, weight="bold"),
             command=self.reload_data
         )
         self.reload_button.pack(side="right", padx=20, pady=20)
 
-        # ============ TẢI DỮ LIỆU BAN ĐẦU ============ #
-        self.reload_data()
+        # ============ TẢI DỮ LIỆU BAN ĐẦU (tự động gọi API) ============ #
+        self.after(100, self.reload_data)  # Delay nhỏ để UI render trước
         
     def reload_data(self):
         """Gọi API từ Controller và cập nhật giao diện"""
+        # Vô hiệu hóa nút để tránh spam click
+        self.reload_button.configure(state="disabled", text="⏳ Đang tải...")
+        self.label_patient_count.configure(text="⏳ Đang tải dữ liệu...")
+        
+        # Cập nhật UI ngay lập tức
+        self.update_idletasks()
+        
         # Xóa nội dung cũ
         for widget in self.frame_bar.winfo_children():
             widget.destroy()
@@ -128,20 +99,13 @@ class HomeUI(ctk.CTkFrame):
         count = self.Home_Ctrl.get_patient_count_this_month()
         if count is not None:
             self.label_patient_count.configure(text=f"Số bệnh nhân trong tháng: {count}")
+            self._data_loaded = True
         else:
             self.label_patient_count.configure(text="⚠️ Không thể tải dữ liệu bệnh nhân.")
-
-    def get_patient_count_this_month(self):
-        try:
-            url = API_ROUTES["statistics"]["month"]
-            response = requests.get(url)
-            data = response.json()
-            return data.get("data", 0)
-        except Exception as e:
-            print("Lỗi khi tải dữ liệu bệnh nhân tháng:", e)
-            return None
-
-    
+        
+        # Kích hoạt lại nút và đổi text
+        self.reload_button.configure(state="normal", text="🔄 Tải lại")
+   
     #========= NUMBER OF PATIENT IN MONTH ==============
     def number_of_patient_in_month(self, parent):
         frame = ctk.CTkFrame(parent, fg_color="white", border_width=2, border_color="black", corner_radius=10 )

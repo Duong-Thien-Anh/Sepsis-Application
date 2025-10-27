@@ -6,9 +6,9 @@ class Windows_DB(ctk.CTk):
     def __init__(self, master=None):
         super().__init__(master)
         
-        # Setting background windows
-        self.minsize(1062, 600)
-        self.center_desktop(1062, 600)
+        # Setting background windows - Tăng kích thước mặc định
+        self.minsize(1280, 720)  # Kích thước tối thiểu lớn hơn
+        self.center_desktop(1280, 720)  # Kích thước mặc định khi mở
         self._set_appearance_mode("System")
         self.title("Hệ Thống Dự Báo Nhiễm Trùng Huyết")
         self.rowconfigure(0, weight=1)
@@ -26,9 +26,9 @@ class Windows_DB(ctk.CTk):
         self.dashboard_component = None
         
         # Hiển thị màn hình đăng nhập đầu tiên
-        # self.show_signin()
+        self.show_signin()
         """Mặc định hiển thị Dashboard để tiện phát triển."""
-        self.show_dashboard() 
+        # self.show_dashboard() 
 
     def show_signin(self):
         """Hiển thị màn hình đăng nhập (SignInComponent)."""
@@ -78,9 +78,9 @@ class Windows_DB(ctk.CTk):
         self.dashboard_component.grid(row=0, column=0, sticky="nsew")
         self.current_component = self.dashboard_component
         
-        # Resize window cho phù hợp với Dashboard
-        self.geometry("1062x600")
-        self.center_desktop(1062, 600)
+        # Resize window cho phù hợp với Dashboard - Tăng kích thước
+        self.geometry("1280x720")
+        self.center_desktop(1280, 720)
         self.title("Dash Board Hệ Thống Dự Báo Nhiễm Trùng Huyết")
         print("✅ Đang hiển thị màn hình chính (Dashboard)")
 

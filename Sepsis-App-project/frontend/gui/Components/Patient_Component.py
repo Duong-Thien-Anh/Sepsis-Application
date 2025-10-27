@@ -4,15 +4,23 @@ from PIL import Image , ImageTk , ImageDraw, ImageOps
 from assets.Assets_Management import AssetManager
 import tkinter as tk
 from tkinter import ttk
+from controllers.Patient_Controller import PatientController
+from gui.Components.Patient_Detail_Component import PatientDetailPopups
 
 class Patient_UI(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color="transparent")
         self.pack(fill="both", expand=True)
+        
+        # Khởi tạo controller
+        self.controller = PatientController()
+        
+        # Khởi tạo popups manager
+        self.popups = PatientDetailPopups(self, self.controller)
 
-        # Cấu hình grid
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=4)
+        # Cấu hình grid - Row 0 tự động điều chỉnh theo nội dung, Row 1 chiếm phần còn lại
+        self.grid_rowconfigure(0, weight=0)  # Row 0 tự động theo nội dung (không co giãn)
+        self.grid_rowconfigure(1, weight=1)  # Row 1 tự động mở rộng chiếm phần còn lại
         self.grid_columnconfigure(0, weight=1)
 
         # ========== ROW 0: 3 columns ==========
@@ -23,8 +31,9 @@ class Patient_UI(ctk.CTkFrame):
 
     def create_row0(self):
         """Tạo row 0 với 3 columns."""
-        row0_frame = ctk.CTkFrame(self, fg_color="white", border_width=2, border_color="black", corner_radius=10)
-        row0_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=(10,5))
+        row0_frame = ctk.CTkFrame(self, fg_color="transparent")
+        row0_frame.grid(row=0, column=0, sticky="ew", padx=10, pady=(10,5))
+        # Bỏ grid_propagate(False) để frame tự động điều chỉnh theo nội dung
         
         # Cấu hình grid cho row0_frame
         row0_frame.grid_columnconfigure(0, weight=1)
@@ -32,12 +41,8 @@ class Patient_UI(ctk.CTkFrame):
         row0_frame.grid_columnconfigure(2, weight=1)
         
         # Column 0 - Dropdown lọc theo cột
-        col0_frame = ctk.CTkFrame(row0_frame, fg_color="#F7F7F5", corner_radius=10)
-        col0_frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
-        
-        # Label tiêu đề
-        label0 = ctk.CTkLabel(col0_frame, text="Lọc theo cột", font=ctk.CTkFont(size=12, weight="bold"), text_color="black")
-        label0.pack(pady=(10,5))
+        col0_frame = ctk.CTkFrame(row0_frame, fg_color="transparent", corner_radius=10 )
+        col0_frame.grid(row=0, column=0, sticky="ns", padx=5, pady=5)
         
         # Dropdown menu
         self.filter_column = ctk.StringVar(value="Tất cả")
@@ -47,14 +52,16 @@ class Patient_UI(ctk.CTkFrame):
             col0_frame,
             variable=self.filter_column,
             values=column_options,
-            font=ctk.CTkFont(size=11),
-            dropdown_font=ctk.CTkFont(size=11),
+            font=ctk.CTkFont(size=11, weight="bold"),
+            dropdown_font=ctk.CTkFont(size=11, weight="bold"),
             width=150,
-            height=30,
+            height=40,
             corner_radius=10,
+            text_color="black",
             fg_color="#66B7FF",
             button_color="#66B7FF",
             button_hover_color="#45a049",
+            dropdown_text_color="black",
             dropdown_fg_color="#F7F7F5",
             dropdown_hover_color="#66B7FF",
             command=self.on_column_filter_change
@@ -62,12 +69,8 @@ class Patient_UI(ctk.CTkFrame):
         self.column_dropdown.pack(pady=(0,10))
         
         # Column 1 - Search box
-        col1_frame = ctk.CTkFrame(row0_frame, fg_color="#F7F7F5", corner_radius=10)
+        col1_frame = ctk.CTkFrame(row0_frame, fg_color="transparent", corner_radius=10)
         col1_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
-        
-        # Label tiêu đề
-        label1 = ctk.CTkLabel(col1_frame, text="Tìm kiếm bệnh nhân", font=ctk.CTkFont(size=12, weight="bold"), text_color="black")
-        label1.pack(pady=(10,5))
         
         # Frame chứa search box và button
         search_container = ctk.CTkFrame(col1_frame, fg_color="transparent")
@@ -78,8 +81,8 @@ class Patient_UI(ctk.CTkFrame):
             search_container,
             placeholder_text="Nhập ID, tên, SĐT...",
             font=ctk.CTkFont(size=11),
-            width=200,
-            height=30,
+            width=300,
+            height=40,
             corner_radius=10,
             border_width=2,
             border_color="black",
@@ -100,8 +103,8 @@ class Patient_UI(ctk.CTkFrame):
                 search_container,
                 text="",
                 image=search_icon,
-                width=30,
-                height=30,
+                width=40,
+                height=40,
                 corner_radius=5,
                 fg_color="#66B7FF",
                 hover_color="#45a049",
@@ -114,8 +117,8 @@ class Patient_UI(ctk.CTkFrame):
             self.search_button = ctk.CTkButton(
                 search_container,
                 text="🔍",
-                width=30,
-                height=30,
+                width=40,
+                height=40,
                 corner_radius=5,
                 fg_color="#66B7FF",
                 hover_color="#45a049",
@@ -131,12 +134,8 @@ class Patient_UI(ctk.CTkFrame):
         self.search_entry.bind("<Return>", lambda event: self.on_search_click())
         
         # Column 2 - Nút thêm/xóa bệnh nhân
-        col2_frame = ctk.CTkFrame(row0_frame, fg_color="#F7F7F5", corner_radius=10)
+        col2_frame = ctk.CTkFrame(row0_frame, fg_color="transparent", corner_radius=10)
         col2_frame.grid(row=0, column=2, sticky="nsew", padx=5, pady=5)
-        
-        # Label tiêu đề
-        label2 = ctk.CTkLabel(col2_frame, text="Thao tác", font=ctk.CTkFont(size=12, weight="bold"), text_color="black")
-        label2.pack(pady=(10,5))
         
         # Frame chứa 2 nút
         buttons_container = ctk.CTkFrame(col2_frame, fg_color="transparent")
@@ -150,7 +149,7 @@ class Patient_UI(ctk.CTkFrame):
             height=40,
             corner_radius=5,
             fg_color="#4CAF50",
-            hover_color="#45a049",
+            hover_color="#F7EA4F",
             border_width=2,
             border_color="black",
             font=ctk.CTkFont(size=20, weight="bold"),
@@ -166,7 +165,7 @@ class Patient_UI(ctk.CTkFrame):
             height=40,
             corner_radius=5,
             fg_color="#F44336",
-            hover_color="#da190b",
+            hover_color="#F7EA4F",
             border_width=2,
             border_color="black",
             font=ctk.CTkFont(size=20, weight="bold"),
@@ -176,6 +175,7 @@ class Patient_UI(ctk.CTkFrame):
 
     def create_patient_table(self):
         """Tạo table hiển thị danh sách bệnh nhân với scrollbar."""
+        # Thêm viền cho frame bảng
         table_frame = ctk.CTkFrame(self, fg_color="white", border_width=2, border_color="black", corner_radius=10)
         table_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=(5,10))
         
@@ -197,7 +197,7 @@ class Patient_UI(ctk.CTkFrame):
         scrollbar_x = ttk.Scrollbar(tree_container, orient="horizontal")
         scrollbar_x.grid(row=1, column=0, sticky="ew")
         
-        # Treeview (Table)
+        # Treeview (Table) - Thêm lại cột "Tác vụ" để hiển thị text "Xem chi tiết"
         columns = ("STT", "ID", "Họ và tên", "Ngày sinh", "Giới tính", "SDT", "Email", "Tác vụ")
         self.tree = ttk.Treeview(
             tree_container,
@@ -231,66 +231,126 @@ class Patient_UI(ctk.CTkFrame):
         self.tree.column("Giới tính", width=80, anchor="center")
         self.tree.column("SDT", width=120, anchor="center")
         self.tree.column("Email", width=180, anchor="w")
-        self.tree.column("Tác vụ", width=100, anchor="center")
+        self.tree.column("Tác vụ", width=130, anchor="center")
         
         # Style cho Treeview
         style = ttk.Style()
         style.theme_use("clam")
+        
+        # Bỏ viền các ô dữ liệu
         style.configure("Treeview",
             background="white",
             foreground="black",
-            rowheight=30,
+            rowheight=40,
             fieldbackground="white",
-            font=("Roboto", 11)
+            font=("Roboto", 11),
+            borderwidth=0,  # Bỏ viền ô
+            relief="flat",  # Không có relief effect
+            highlightthickness=0  # Bỏ viền khi focus
         )
+        
+        # Tiêu đề cột: style với viền dưới
         style.configure("Treeview.Heading",
             background="#66B7FF",
             foreground="white",
             font=("Roboto", 12, "bold"),
-            borderwidth=2,
-            relief="raised"
-        )
-        style.map("Treeview",
-            background=[("selected", "#66B7FF")]
+            borderwidth=1,      # Chỉ giữ 1px
+            relief="flat"       # Flat style
         )
         
-        # Thêm dữ liệu mẫu (có thể xóa sau)
+        # Màu khi selected - màu nhạt để dễ nhìn
+        style.map("Treeview",
+            background=[("selected", "#E3F2FD")],  # Màu xanh nhạt khi chọn
+            foreground=[("selected", "black")]
+        )
+        
+        # Map cho heading - hover effect
+        style.map("Treeview.Heading",
+            background=[("active", "#5aa3e0")],
+            foreground=[("active", "white")],
+            relief=[("active", "flat")]
+        )
+        
+        # Thêm dữ liệu mẫu - Thêm text "Xem chi tiết" vào cột cuối
         sample_data = [
-            ("1", "BN001", "Nguyễn Văn A", "01/01/1990", "Nam", "0901234567", "nguyenvana@email.com", "Xem/Sửa/Xóa"),
-            ("2", "BN002", "Trần Thị B", "15/05/1985", "Nữ", "0912345678", "tranthib@email.com", "Xem/Sửa/Xóa"),
-            ("3", "BN003", "Lê Văn C", "20/08/1992", "Nam", "0923456789", "levanc@email.com", "Xem/Sửa/Xóa"),
-            ("4", "BN004", "Phạm Thị D", "10/12/1988", "Nữ", "0934567890", "phamthid@email.com", "Xem/Sửa/Xóa"),
-            ("5", "BN005", "Hoàng Văn E", "25/03/1995", "Nam", "0945678901", "hoangvane@email.com", "Xem/Sửa/Xóa"),
+            ("1", "BN001", "Nguyễn Văn A", "01/01/1990", "Nam", "0901234567", "nguyenvana@email.com", "📋 Xem chi tiết"),
+            ("2", "BN002", "Trần Thị B", "15/05/1985", "Nữ", "0912345678", "tranthib@email.com", "📋 Xem chi tiết"),
+            ("3", "BN003", "Lê Văn C", "20/08/1992", "Nam", "0923456789", "levanc@email.com", "📋 Xem chi tiết"),
+            ("4", "BN004", "Phạm Thị D", "10/12/1988", "Nữ", "0934567890", "phamthid@email.com", "📋 Xem chi tiết"),
+            ("5", "BN005", "Hoàng Văn E", "25/03/1995", "Nam", "0945678901", "hoangvane@email.com", "📋 Xem chi tiết"),
+            ("6", "BN006", "Võ Thị F", "12/07/1993", "Nữ", "0956789012", "vothif@email.com", "📋 Xem chi tiết"),
+            ("7", "BN007", "Đặng Văn G", "30/11/1987", "Nam", "0967890123", "dangvang@email.com", "📋 Xem chi tiết"),
+            ("8", "BN008", "Mai Thị H", "18/02/1991", "Nữ", "0978901234", "maithih@email.com", "📋 Xem chi tiết"),
         ]
         
         for data in sample_data:
             self.tree.insert("", "end", values=data)
+        
+        # Bind double-click vào cột "Tác vụ" để xem chi tiết
+        self.tree.bind('<Double-Button-1>', self.on_tree_double_click)
+        
+        # Tag để tô màu cột Tác vụ giống button
+        self.tree.tag_configure('action', foreground='#2e7d32', font=('Roboto', 11, 'bold'))
+        
+    def on_tree_double_click(self, event):
+        """Xử lý khi double-click vào một dòng trong bảng."""
+        # Lấy item được click
+        item = self.tree.identify('item', event.x, event.y)
+        if not item:
+            return
+        
+        # Lấy column được click
+        column = self.tree.identify_column(event.x)
+        
+        # Lấy dữ liệu của dòng
+        values = self.tree.item(item, 'values')
+        if not values:
+            return
+        
+        # Nếu click vào cột "Tác vụ" hoặc bất kỳ cột nào, hiển thị chi tiết
+        # Column #8 là cột "Tác vụ" (index bắt đầu từ #1)
+        patient_data = values[:7]  # Lấy 7 cột đầu (không lấy cột "Tác vụ")
+        
+        # Sử dụng popups manager để hiển thị chi tiết
+        self.popups.show_patient_detail(
+            patient_data,
+            on_edit_callback=self.edit_patient,
+            on_delete_callback=self.delete_from_detail
+        )
+    
+    # ==================== CALLBACK METHODS ====================
+    
+    def edit_patient(self, patient_data):
+        """Callback khi nhấn nút Sửa từ popup chi tiết."""
+        print(f"✏️ Chỉnh sửa: {patient_data[2]}")
+        self.popups.show_edit_patient_form(patient_data, self.save_edit_patient)
+    
+    def delete_from_detail(self, patient_data):
+        """Callback khi nhấn nút Xóa từ popup chi tiết."""
+        # Tìm item_id từ patient_data
+        for item_id in self.tree.get_children():
+            values = self.tree.item(item_id)['values']
+            if values[1] == patient_data[1]:  # So sánh ID
+                patient_name = patient_data[2]
+                self.popups.show_confirm_delete_popup(
+                    patient_name,
+                    on_confirm_callback=lambda popup: self.confirm_delete(popup, item_id, patient_name)
+                )
+                break
     
     def on_column_filter_change(self, selected_column):
         """Xử lý khi người dùng chọn cột để lọc."""
         print(f"🔍 Lọc theo cột: {selected_column}")
         
-        # Lưu lại tất cả columns ban đầu
-        all_columns = ("STT", "ID", "Họ và tên", "Ngày sinh", "Giới tính", "SDT", "Email", "Tác vụ")
-        
-        if selected_column == "Tất cả":
-            # Hiển thị tất cả các cột
-            self.tree["displaycolumns"] = all_columns
-        else:
-            # Hiển thị cột được chọn + STT + Tác vụ (để user vẫn biết thứ tự và thao tác)
-            if selected_column == "STT":
-                self.tree["displaycolumns"] = ("STT", "Tác vụ")
-            elif selected_column in all_columns:
-                # Hiển thị: STT + cột được chọn + Tác vụ
-                self.tree["displaycolumns"] = ("STT", selected_column, "Tác vụ")
-            else:
-                self.tree["displaycolumns"] = all_columns
+        # Gọi controller để lấy cột hiển thị
+        display_columns, _ = self.controller.filter_by_column(selected_column, [])
+        self.tree["displaycolumns"] = display_columns
         
         print(f"✅ Hiển thị các cột: {self.tree['displaycolumns']}")
     
     def on_search_click(self):
         """Xử lý khi người dùng click nút tìm kiếm."""
-        search_text = self.search_entry.get().strip().lower()
+        search_text = self.search_entry.get().strip()
         print(f"🔍 Tìm kiếm: {search_text}")
         
         if not search_text:
@@ -300,31 +360,42 @@ class Patient_UI(ctk.CTkFrame):
             print("✅ Hiển thị tất cả dữ liệu")
             return
         
-        # Lọc dữ liệu theo search text
-        matched_items = []
+        # Lấy danh sách tất cả bệnh nhân từ tree
+        all_patients = []
+        item_map = {}  # Map patient_id -> tree_item_id
+        
         for item in self.tree.get_children():
             values = self.tree.item(item)['values']
-            # Tìm trong tất cả các cột (chuyển về lowercase để so sánh)
-            item_text = ' '.join(str(v).lower() for v in values)
-            
-            if search_text in item_text:
-                matched_items.append(item)
+            patient = {
+                'id': values[1],
+                'full_name': values[2],
+                'birth_date': values[3],
+                'gender': values[4],
+                'phone': values[5],
+                'email': values[6]
+            }
+            all_patients.append(patient)
+            item_map[values[1]] = item
         
-        # Xóa tất cả items hiện tại
+        # Gọi controller để tìm kiếm
+        matched_patients = self.controller.search_patients(search_text, all_patients)
+        matched_ids = {p['id'] for p in matched_patients}
+        
+        # Detach tất cả items
         for item in self.tree.get_children():
             self.tree.detach(item)
         
-        # Chỉ hiển thị items khớp
-        for item in matched_items:
-            self.tree.reattach(item, '', 'end')
+        # Reattach chỉ các items khớp
+        for patient_id in matched_ids:
+            if patient_id in item_map:
+                self.tree.reattach(item_map[patient_id], '', 'end')
         
-        print(f"✅ Tìm thấy {len(matched_items)} kết quả")
+        print(f"✅ Tìm thấy {len(matched_patients)} kết quả")
     
     def on_add_patient(self):
         """Xử lý khi người dùng click nút thêm bệnh nhân (+)."""
         print("➕ Nút thêm bệnh nhân được click")
-        # TODO: Implement thêm bệnh nhân mới
-        pass
+        self.popups.show_add_patient_form(self.save_new_patient)
     
     def on_delete_patient(self):
         """Xử lý khi người dùng click nút xóa bệnh nhân (-)."""
@@ -344,111 +415,115 @@ class Patient_UI(ctk.CTkFrame):
         
         print(f"🗑️ Yêu cầu xóa bệnh nhân: {patient_name} (ID: {patient_id})")
         
-        # Hiển thị popup xác nhận
-        self.show_confirm_delete_popup(selected_item, patient_name)
-    
-    def show_warning_popup(self, message):
-        """Hiển thị popup cảnh báo."""
-        popup = ctk.CTkToplevel(self)
-        popup.title("Cảnh báo")
-        popup.geometry("300x150")
-        popup.resizable(False, False)
-        
-        # Đưa popup lên trên cùng
-        popup.lift()
-        popup.attributes('-topmost', True)
-        
-        # Căn giữa màn hình
-        popup.update_idletasks()
-        x = (popup.winfo_screenwidth() // 2) - (300 // 2)
-        y = (popup.winfo_screenheight() // 2) - (150 // 2)
-        popup.geometry(f"300x150+{x}+{y}")
-        
-        # Nội dung popup
-        label = ctk.CTkLabel(
-            popup,
-            text=message,
-            font=ctk.CTkFont(size=14),
-            wraplength=250
+        # Hiển thị popup xác nhận qua popups manager
+        self.popups.show_confirm_delete_popup(
+            patient_name,
+            on_confirm_callback=lambda popup: self.confirm_delete(popup, selected_item, patient_name)
         )
-        label.pack(pady=30)
-        
-        # Nút OK
-        ok_button = ctk.CTkButton(
-            popup,
-            text="OK",
-            width=100,
-            height=35,
-            fg_color="#66B7FF",
-            hover_color="#45a049",
-            command=popup.destroy
-        )
-        ok_button.pack(pady=10)
-    
-    def show_confirm_delete_popup(self, item_id, patient_name):
-        """Hiển thị popup xác nhận xóa bệnh nhân."""
-        popup = ctk.CTkToplevel(self)
-        popup.title("Xác nhận xóa")
-        popup.geometry("400x180")
-        popup.resizable(False, False)
-        
-        # Đưa popup lên trên cùng
-        popup.lift()
-        popup.attributes('-topmost', True)
-        
-        # Căn giữa màn hình
-        popup.update_idletasks()
-        x = (popup.winfo_screenwidth() // 2) - (400 // 2)
-        y = (popup.winfo_screenheight() // 2) - (180 // 2)
-        popup.geometry(f"400x180+{x}+{y}")
-        
-        # Nội dung popup
-        message = f"Bạn có chắc muốn xóa bệnh nhân\n'{patient_name}' không?"
-        label = ctk.CTkLabel(
-            popup,
-            text=message,
-            font=ctk.CTkFont(size=14),
-            wraplength=350
-        )
-        label.pack(pady=30)
-        
-        # Frame chứa 2 nút Yes/No
-        button_frame = ctk.CTkFrame(popup, fg_color="transparent")
-        button_frame.pack(pady=10)
-        
-        # Nút Yes
-        yes_button = ctk.CTkButton(
-            button_frame,
-            text="Yes",
-            width=100,
-            height=35,
-            fg_color="#F44336",
-            hover_color="#da190b",
-            command=lambda: self.confirm_delete(popup, item_id, patient_name)
-        )
-        yes_button.pack(side="left", padx=10)
-        
-        # Nút No
-        no_button = ctk.CTkButton(
-            button_frame,
-            text="No",
-            width=100,
-            height=35,
-            fg_color="#66B7FF",
-            hover_color="#45a049",
-            command=popup.destroy
-        )
-        no_button.pack(side="left", padx=10)
     
     def confirm_delete(self, popup, item_id, patient_name):
         """Xác nhận và thực hiện xóa bệnh nhân."""
-        # Xóa bệnh nhân khỏi table
-        self.tree.delete(item_id)
-        print(f"✅ Đã xóa bệnh nhân: {patient_name}")
+        # Lấy patient_id từ tree item
+        values = self.tree.item(item_id)['values']
+        patient_id = values[1]
         
-        # TODO: Gọi API backend để xóa bệnh nhân khỏi database
+        # Gọi controller để xóa bệnh nhân
+        success, message = self.controller.delete_patient(patient_id)
+        
+        if success:
+            # Xóa khỏi table nếu API thành công
+            self.tree.delete(item_id)
+            print(f"✅ Đã xóa bệnh nhân: {patient_name}")
+        else:
+            # Hiển thị lỗi nếu thất bại
+            self.popups.show_warning_popup(f"Lỗi: {message}")
         
         # Đóng popup
         popup.destroy()
+    
+    # ==================== SAVE METHODS ====================
+    
+    def save_new_patient(self, fields, popup):
+        """Lưu bệnh nhân mới."""
+        # Lấy dữ liệu từ form
+        patient_data = {
+            'full_name': fields['full_name'].get().strip(),
+            'birth_date': fields['birth_date'].get().strip(),
+            'gender': fields['gender'].get(),
+            'phone': fields['phone'].get().strip(),
+            'email': fields['email'].get().strip()
+        }
+        
+        # Validate
+        is_valid, error_message = self.controller.validate_patient_data(patient_data)
+        if not is_valid:
+            self.popups.show_warning_popup(error_message)
+            return
+        
+        # Gọi API để tạo bệnh nhân
+        success, message, data = self.controller.create_patient(patient_data)
+        
+        if success:
+            # Thêm vào table
+            new_stt = len(self.tree.get_children()) + 1
+            new_row = (
+                str(new_stt),
+                data.get('id', ''),
+                patient_data['full_name'],
+                patient_data['birth_date'],
+                patient_data['gender'],
+                patient_data['phone'],
+                patient_data['email'],
+                "📋 Xem chi tiết"
+            )
+            self.tree.insert("", "end", values=new_row)
+            print(f"✅ Đã thêm bệnh nhân: {patient_data['full_name']}")
+            popup.destroy()
+        else:
+            self.popups.show_warning_popup(f"Lỗi: {message}")
+    
+    def save_edit_patient(self, patient_id, fields, popup):
+        """Lưu thay đổi bệnh nhân."""
+        # Lấy dữ liệu từ form
+        patient_data = {
+            'full_name': fields['full_name'].get().strip(),
+            'birth_date': fields['birth_date'].get().strip(),
+            'gender': fields['gender'].get(),
+            'phone': fields['phone'].get().strip(),
+            'email': fields['email'].get().strip()
+        }
+        
+        # Validate
+        is_valid, error_message = self.controller.validate_patient_data(patient_data)
+        if not is_valid:
+            self.popups.show_warning_popup(error_message)
+            return
+        
+        # Gọi API để cập nhật
+        success, message, data = self.controller.update_patient(patient_id, patient_data)
+        
+        if success:
+            # Cập nhật trong table
+            for item in self.tree.get_children():
+                values = self.tree.item(item)['values']
+                if values[1] == patient_id:
+                    updated_row = (
+                        values[0],  # Giữ nguyên STT
+                        patient_id,
+                        patient_data['full_name'],
+                        patient_data['birth_date'],
+                        patient_data['gender'],
+                        patient_data['phone'],
+                        patient_data['email'],
+                        "📋 Xem chi tiết"
+                    )
+                    self.tree.item(item, values=updated_row)
+                    break
+            
+            print(f"✅ Đã cập nhật bệnh nhân: {patient_data['full_name']}")
+            popup.destroy()
+        else:
+            self.popups.show_warning_popup(f"Lỗi: {message}")
+
 
  
