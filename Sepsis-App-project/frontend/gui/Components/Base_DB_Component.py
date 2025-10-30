@@ -6,6 +6,10 @@ from gui.Components.Header_Component import HeaderFormUI
 from gui.Components.Home_Component import HomeUI
 from gui.Components.Ai_Component import AI_UI
 from gui.Components.Patient_Component import Patient_UI
+from gui.Components.Employee_Component import Employee_UI
+from gui.Components.Account_Component import Account_UI
+from gui.Components.Recall_Appointment_Component import RecallAppointment_UI
+from gui.Components.Settings_Component import Settings_UI
 
 # ========== DASHBOARD COMPONENT ==========
 class DashBoardComponent(ctk.CTkFrame):
@@ -60,10 +64,10 @@ class DashBoardComponent(ctk.CTkFrame):
             ("btn_Menu", HomeUI, "Home"),
             ("btn_Ai", AI_UI, None),
             ("btn_Patient", Patient_UI, None),
-            ("btn_Employee", HomeUI, None),
-            ("btn_Account", HomeUI, None),
-            ("btn_Recall_Appointment", HomeUI, None),
-            ("btn_setting", HomeUI, None),
+            ("btn_Employee", Employee_UI, None),
+            ("btn_Account", Account_UI, None),
+            ("btn_Recall_Appointment", RecallAppointment_UI, None),
+            ("btn_setting", Settings_UI, None),
             ("btn_Sign_Out", None, "logout")
         ]
 
@@ -190,6 +194,12 @@ class DashBoardComponent(ctk.CTkFrame):
         print(f"✨ Tạo mới instance của {content_class.__name__}")
         content = content_class(self.layer2_DB)
         content.pack(fill="both", expand=True)
+        
+        # Cập nhật breadcrumb trong header
+        if hasattr(self, 'header') and hasattr(self.header, 'update_breadcrumb'):
+            self.header.update_breadcrumb(content_class.__name__)
+        else:
+            print(f"⚠️ Không tìm thấy header.update_breadcrumb()")
     
     # ========== HANDLE LOGOUT ==========
     def handle_logout(self):

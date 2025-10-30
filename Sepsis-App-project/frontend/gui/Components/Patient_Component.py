@@ -5,7 +5,9 @@ from assets.Assets_Management import AssetManager
 import tkinter as tk
 from tkinter import ttk
 from controllers.Patient_Controller import PatientController
-from gui.Components.Patient_Detail_Component import PatientDetailPopups
+from gui.Components.Patient_Detail_Component import PatientDetail
+from gui.Components.Patient_Forms_Component import PatientForms
+from gui.Components.Patient_Dialogs_Component import PatientDialogs
 
 class Patient_UI(ctk.CTkFrame):
     def __init__(self, parent):
@@ -15,8 +17,10 @@ class Patient_UI(ctk.CTkFrame):
         # Khởi tạo controller
         self.controller = PatientController()
         
-        # Khởi tạo popups manager
-        self.popups = PatientDetailPopups(self, self.controller)
+        # Khởi tạo các component quản lý popups
+        self.detail_popup = PatientDetail(self)      # Popup chi tiết bệnh nhân
+        self.forms = PatientForms(self)              # Form thêm/sửa bệnh nhân
+        self.dialogs = PatientDialogs(self)          # Dialog xác nhận/cảnh báo
 
         # Cấu hình grid - Row 0 tự động điều chỉnh theo nội dung, Row 1 chiếm phần còn lại
         self.grid_rowconfigure(0, weight=0)  # Row 0 tự động theo nội dung (không co giãn)
@@ -174,44 +178,41 @@ class Patient_UI(ctk.CTkFrame):
         self.delete_button.pack(side="left", padx=5)
 
     def create_patient_table(self):
-        """Tạo table hiển thị danh sách bệnh nhân với scrollbar."""
+        """Tạo table hiển thị danh sách bệnh nhân với scrollbar đẹp."""
         # Frame ngoài với viền và bo góc
-        table_frame = ctk.CTkFrame(self, fg_color="white", border_width=2, border_color="black", corner_radius=15)
-        table_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=(5,10))
+        outer_frame = ctk.CTkFrame(self, fg_color="black", corner_radius=15)
+        outer_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=(5,10))
         
         # Cấu hình grid
+        outer_frame.grid_rowconfigure(0, weight=1)
+        outer_frame.grid_columnconfigure(0, weight=1)
+        
+        # Frame trắng bên trong (tạo hiệu ứng viền)
+        table_frame = ctk.CTkFrame(outer_frame, fg_color="white", corner_radius=13)
+        table_frame.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
         table_frame.grid_rowconfigure(0, weight=1)
         table_frame.grid_columnconfigure(0, weight=1)
         
-        # Container bên trong với bo góc và clip content
-        tree_container = ctk.CTkFrame(table_frame, fg_color="white", corner_radius=15)
-        tree_container.grid(row=0, column=0, sticky="nsew", padx=8, pady=8)
-        tree_container.grid_rowconfigure(0, weight=1)
-        tree_container.grid_columnconfigure(0, weight=1)
+        # Scrollable frame với custom scrollbar
+        scrollable_frame = ctk.CTkScrollableFrame(
+            table_frame,
+            fg_color="white",
+            scrollbar_button_color="#66B7FF",
+            scrollbar_button_hover_color="#45a049",
+            corner_radius=10
+        )
+        scrollable_frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+        scrollable_frame.grid_columnconfigure(0, weight=1)
         
-        # Scrollbar dọc
-        scrollbar_y = ttk.Scrollbar(tree_container, orient="vertical")
-        scrollbar_y.grid(row=0, column=1, sticky="ns")
-        
-        # Scrollbar ngang
-        scrollbar_x = ttk.Scrollbar(tree_container, orient="horizontal")
-        scrollbar_x.grid(row=1, column=0, sticky="ew")
-        
-        # Treeview (Table) - Thêm lại cột "Tác vụ" để hiển thị text "Xem chi tiết"
+        # Treeview (Table) - Bỏ scrollbar vì scrollable_frame đã có
         columns = ("STT", "ID", "Họ và tên", "Ngày sinh", "Giới tính", "SDT", "Email", "Tác vụ")
         self.tree = ttk.Treeview(
-            tree_container,
+            scrollable_frame,
             columns=columns,
             show="headings",
-            yscrollcommand=scrollbar_y.set,
-            xscrollcommand=scrollbar_x.set,
             height=15
         )
         self.tree.grid(row=0, column=0, sticky="nsew")
-        
-        # Kết nối scrollbar với treeview
-        scrollbar_y.config(command=self.tree.yview)
-        scrollbar_x.config(command=self.tree.xview)
         
         # Cấu hình tiêu đề cột
         self.tree.heading("STT", text="STT")
@@ -322,8 +323,8 @@ class Patient_UI(ctk.CTkFrame):
         # Column #8 là cột "Tác vụ" (index bắt đầu từ #1)
         patient_data = values[:7]  # Lấy 7 cột đầu (không lấy cột "Tác vụ")
         
-        # Sử dụng popups manager để hiển thị chi tiết
-        self.popups.show_patient_detail(
+        # Sử dụng detail_popup để hiển thị chi tiết
+        self.detail_popup.show_patient_detail(
             patient_data,
             on_edit_callback=self.edit_patient,
             on_delete_callback=self.delete_from_detail
@@ -334,7 +335,7 @@ class Patient_UI(ctk.CTkFrame):
     def edit_patient(self, patient_data):
         """Callback khi nhấn nút Sửa từ popup chi tiết."""
         print(f"✏️ Chỉnh sửa: {patient_data[2]}")
-        self.popups.show_edit_patient_form(patient_data, self.save_edit_patient)
+        self.forms.show_edit_patient_form(patient_data, self.save_edit_patient)
     
     def delete_from_detail(self, patient_data):
         """Callback khi nhấn nút Xóa từ popup chi tiết."""
@@ -343,7 +344,7 @@ class Patient_UI(ctk.CTkFrame):
             values = self.tree.item(item_id)['values']
             if values[1] == patient_data[1]:  # So sánh ID
                 patient_name = patient_data[2]
-                self.popups.show_confirm_delete_popup(
+                self.dialogs.show_confirm_delete_popup(
                     patient_name,
                     on_confirm_callback=lambda popup: self.confirm_delete(popup, item_id, patient_name)
                 )
@@ -406,7 +407,7 @@ class Patient_UI(ctk.CTkFrame):
     def on_add_patient(self):
         """Xử lý khi người dùng click nút thêm bệnh nhân (+)."""
         print("➕ Nút thêm bệnh nhân được click")
-        self.popups.show_add_patient_form(self.save_new_patient)
+        self.forms.show_add_patient_form(self.save_new_patient)
     
     def on_delete_patient(self):
         """Xử lý khi người dùng click nút xóa bệnh nhân (-)."""
@@ -415,7 +416,7 @@ class Patient_UI(ctk.CTkFrame):
         
         if not selected_items:
             # Hiển thị thông báo nếu chưa chọn bệnh nhân
-            self.show_warning_popup("Vui lòng chọn bệnh nhân cần xóa!")
+            self.dialogs.show_warning_popup("Vui lòng chọn bệnh nhân cần xóa!")
             return
         
         # Lấy thông tin bệnh nhân được chọn
@@ -426,8 +427,8 @@ class Patient_UI(ctk.CTkFrame):
         
         print(f"🗑️ Yêu cầu xóa bệnh nhân: {patient_name} (ID: {patient_id})")
         
-        # Hiển thị popup xác nhận qua popups manager
-        self.popups.show_confirm_delete_popup(
+        # Hiển thị popup xác nhận qua dialogs
+        self.dialogs.show_confirm_delete_popup(
             patient_name,
             on_confirm_callback=lambda popup: self.confirm_delete(popup, selected_item, patient_name)
         )
@@ -447,30 +448,20 @@ class Patient_UI(ctk.CTkFrame):
             print(f"✅ Đã xóa bệnh nhân: {patient_name}")
         else:
             # Hiển thị lỗi nếu thất bại
-            self.popups.show_warning_popup(f"Lỗi: {message}")
+            self.dialogs.show_warning_popup(f"Lỗi: {message}")
         
         # Đóng popup
         popup.destroy()
     
     # ==================== SAVE METHODS ====================
     
-    def save_new_patient(self, fields, popup):
-        """Lưu bệnh nhân mới."""
-        # Lấy dữ liệu từ form
-        patient_data = {
-            'full_name': fields['full_name'].get().strip(),
-            'birth_date': fields['birth_date'].get().strip(),
-            'gender': fields['gender'].get(),
-            'phone': fields['phone'].get().strip(),
-            'email': fields['email'].get().strip()
-        }
+    def save_new_patient(self, patient_data, popup):
+        """Lưu bệnh nhân mới từ form mới.
         
-        # Validate
-        is_valid, error_message = self.controller.validate_patient_data(patient_data)
-        if not is_valid:
-            self.popups.show_warning_popup(error_message)
-            return
-        
+        Args:
+            patient_data: Dictionary chứa dữ liệu bệnh nhân (đã chuẩn bị cho API)
+            popup: Cửa sổ popup cần đóng sau khi lưu
+        """
         # Gọi API để tạo bệnh nhân
         success, message, data = self.controller.create_patient(patient_data)
         
@@ -480,18 +471,18 @@ class Patient_UI(ctk.CTkFrame):
             new_row = (
                 str(new_stt),
                 data.get('id', ''),
-                patient_data['full_name'],
-                patient_data['birth_date'],
-                patient_data['gender'],
-                patient_data['phone'],
-                patient_data['email'],
+                patient_data.get('full_name', ''),
+                patient_data.get('birth_date', ''),
+                patient_data.get('gender', ''),
+                patient_data.get('phone', ''),
+                patient_data.get('email', ''),
                 "📋 Xem chi tiết"
             )
             self.tree.insert("", "end", values=new_row)
-            print(f"✅ Đã thêm bệnh nhân: {patient_data['full_name']}")
+            print(f"✅ Đã thêm bệnh nhân: {patient_data.get('full_name', 'N/A')}")
             popup.destroy()
         else:
-            self.popups.show_warning_popup(f"Lỗi: {message}")
+            self.dialogs.show_warning_popup(f"Lỗi: {message}")
     
     def save_edit_patient(self, patient_id, fields, popup):
         """Lưu thay đổi bệnh nhân."""
@@ -507,7 +498,7 @@ class Patient_UI(ctk.CTkFrame):
         # Validate
         is_valid, error_message = self.controller.validate_patient_data(patient_data)
         if not is_valid:
-            self.popups.show_warning_popup(error_message)
+            self.dialogs.show_warning_popup(error_message)
             return
         
         # Gọi API để cập nhật
@@ -534,7 +525,7 @@ class Patient_UI(ctk.CTkFrame):
             print(f"✅ Đã cập nhật bệnh nhân: {patient_data['full_name']}")
             popup.destroy()
         else:
-            self.popups.show_warning_popup(f"Lỗi: {message}")
+            self.dialogs.show_warning_popup(f"Lỗi: {message}")
 
 
  

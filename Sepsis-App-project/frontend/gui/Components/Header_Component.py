@@ -3,6 +3,7 @@ import tkinter as tk
 from PIL import Image , ImageTk , ImageDraw, ImageOps
 from controllers.Header_Controller import HeaderController
 from assets.Assets_Management import AssetManager
+from gui.Components.Notification_Component import NotificationUI
 
 # ========== DASHBOARD FORM ==========
 class HeaderFormUI(ctk.CTkFrame):
@@ -12,12 +13,29 @@ class HeaderFormUI(ctk.CTkFrame):
         # optional: allow controller to call back component if needed
         self.parent_component = parent_component 
         self.pack(fill="both", expand=True)
+        
+        # Lưu reference đến breadcrumb frame để có thể cập nhật
+        self.breadcrumb_frame = None
+        
+        # Khởi tạo Notification UI Component
+        self.notification_ui = NotificationUI(self)
+        
+        # Mapping giữa component class name và breadcrumb path
+        self.breadcrumb_map = {
+            "HomeUI": ["🏠 Home", "Trang chủ"],
+            "AI_UI": ["🏠 Home", "🤖 AI", "Dự đoán Sepsis"],
+            "Patient_UI": ["🏠 Home", "🏥 Bệnh nhân", "Quản lý bệnh nhân"],
+            "Employee_UI": ["🏠 Home", "👥 Nhân viên", "Quản lý nhân viên"],
+            "Account_UI": ["🏠 Home", "👤 Tài khoản", "Quản lý tài khoản"],
+            "RecallAppointment_UI": ["🏠 Home", "📅 Tái khám", "Thông báo tái khám"],
+            "Settings_UI": ["🏠 Home", "⚙️ Cài đặt", "Cấu hình hệ thống"],
+        }
 
     # ==========  HEADER ==========
     def create_header(self, layer1):
         layer1.configure(fg_color = "#F7F7F5")
 
-        self.create_breadcrumb(layer1, ["Home"])
+        self.breadcrumb_frame = self.create_breadcrumb(layer1, ["🏠 Home", "Trang chủ"])
         self.create_title(layer1)
         self.create_notification_button(layer1)
         self.create_login_button(layer1)
@@ -35,27 +53,64 @@ class HeaderFormUI(ctk.CTkFrame):
         )
         breadcrumb_frame.grid(row=0, column=0, sticky="w", padx=10)
 
+        # Lưu parent để có thể tái tạo breadcrumb
+        breadcrumb_frame.parent_container = parent
+        breadcrumb_frame.grid_info_stored = {"row": 0, "column": 0, "sticky": "w", "padx": 10}
+
         for i, crumb in enumerate(items):
+            # Xác định màu: phần tử cuối cùng màu đậm, các phần trước màu nhạt
+            if i == len(items) - 1:
+                text_color = "#000000"  # Màu đen cho trang hiện tại
+                font_weight = "bold"
+            else:
+                text_color = "#5D5C5C"  # Màu xám cho các trang trước
+                font_weight = "normal"
+            
             label = ctk.CTkLabel(
                 breadcrumb_frame,
                 text=crumb,
-                font=("Roboto", 15, "bold"),
-                text_color="#5D5C5C",
+                font=("Roboto", 14, font_weight),
+                text_color=text_color,
                 fg_color="transparent"
             )
             label.grid(row=0, column=i*2, padx=2, pady=5, sticky="w")
 
-            if i < len(items) - 1:  # chưa phải phần tử cuối thì thêm dấu ">"
+            if i < len(items) - 1:  # chưa phải phần tử cuối thì thêm dấu "›"
                 separator = ctk.CTkLabel(
                     breadcrumb_frame,
-                    text=">",
-                    font=("Arial", 12),
-                    text_color="#000000",
-                    fg_color="#FFFFFF"
+                    text="›",
+                    font=("Roboto", 16, "bold"),
+                    text_color="#9E9E9E",
+                    fg_color="transparent"
                 )
-                separator.grid(row=0, column=i*2+1, padx=2, pady=5, sticky="w")
+                separator.grid(row=0, column=i*2+1, padx=5, pady=5, sticky="w")
 
         return breadcrumb_frame
+    
+    def update_breadcrumb(self, component_class_name):
+        """
+        Cập nhật breadcrumb dựa trên component hiện tại.
+        
+        Args:
+            component_class_name (str): Tên class của component (vd: "HomeUI", "Patient_UI")
+        """
+        if self.breadcrumb_frame is None:
+            return
+        
+        # Lấy breadcrumb path từ mapping
+        breadcrumb_items = self.breadcrumb_map.get(component_class_name, ["🏠 Home", "Trang chủ"])
+        
+        # Lưu thông tin grid
+        parent = self.breadcrumb_frame.parent_container
+        grid_info = self.breadcrumb_frame.grid_info_stored
+        
+        # Xóa breadcrumb cũ
+        self.breadcrumb_frame.destroy()
+        
+        # Tạo breadcrumb mới
+        self.breadcrumb_frame = self.create_breadcrumb(parent, breadcrumb_items)
+        
+        print(f"✅ Breadcrumb updated: {' › '.join(breadcrumb_items)}")
     # # ==========  TITLE  ==========
     def create_title(self, parent):
         # Load ảnh
@@ -77,26 +132,11 @@ class HeaderFormUI(ctk.CTkFrame):
 
     # ==========  BUTTON NOTIFICATION ==========
     def create_notification_button(self, parent, count=0, command=None):
-        # ========== LOAD ICON ==========
-        path_bell = AssetManager.get_icon_path("icon_Bell")
-        bell_img = Image.open(path_bell).resize((30, 30))
-        bell_ctk = ctk.CTkImage(bell_img)
-
-        # ========== FRAME chứa ==========
-        frame = ctk.CTkFrame(parent, fg_color="white", width=50, height=50 , corner_radius=30 , border_color="black", border_width=2)
-        frame.image_refs = ( bell_ctk)  # giữ reference
-
-        # Chuông nằm giữa
-        bell = ctk.CTkLabel(frame, image=bell_ctk, text="", fg_color="transparent")
-        bell.place(relx=0.5, rely=0.5, anchor="center")
-
-        # Badge đỏ (ảnh PNG) đặt ở góc phải trên
-        badge_icon = ctk.CTkFrame(frame, fg_color="red", width=15, height=15 , corner_radius=15 , border_color="black", border_width=2)
-
-        self.Header_Ctrl.setup_events(frame, bell, badge_icon, count, command)
-
-        frame.grid(row=0, column=2, padx=10, pady=10, sticky="e")
-        return frame
+        """
+        Tạo button thông báo.
+        Chức năng thực tế được xử lý bởi NotificationUI component.
+        """
+        return self.notification_ui.create_notification_button(parent)
 
     # ==========  BUTTON USER===================
     def make_rounded_avatar(self, path, size=(50, 50), border=2, border_color="#FE5858"):
