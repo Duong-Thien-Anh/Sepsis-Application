@@ -1,0 +1,44 @@
+services:
+  sesips_api:
+    build: .
+    environment:
+      MYSQL_ROOT_PWD: ${MYSQL_ROOT_PWD}
+      MYSQL_DB: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PWD: ${MYSQL_PWD}
+      MYSQL_PORT: ${MYSQL_PORT}
+    depends_on:
+      sesips_db:
+        condition: service_healthy
+    ports:
+      - ${APP_PORT}:8000
+    networks:
+      - sesips_backend
+
+  sesips_db:
+    image: mysql:8.0
+    container_name: sesips_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PWD}
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PWD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - ${MYSQL_PORT}:3306
+    networks:
+      - sesips_backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+networks:
+  sesips_backend:
+
+volumes:
+  mysql-data:
