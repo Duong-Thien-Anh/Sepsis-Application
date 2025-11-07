@@ -28,6 +28,7 @@ services:
       DW_DB_USER: ${MYSQL_USER}
       DW_DB_PASS: ${MYSQL_PWD}
       DW_DB_HOST: sepsis_db
+      GRAPHQLAPI_URL: http://localhost:${DW_API_PORT}/graphql
     networks:
       - sepsis_backend
     ports:
