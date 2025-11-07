@@ -46,7 +46,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PWD}
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./sql/database.sql:/docker-entrypoint-initdb.d/database.sql
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./sql/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
     ports:
       - ${MYSQL_PORT}:3306
     networks:
