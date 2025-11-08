@@ -1,0 +1,66 @@
+services:
+  sepsis_api:
+    build: .
+    environment:
+      MYSQL_ROOT_PWD: ${MYSQL_ROOT_PWD}
+      MYSQL_DB: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PWD: ${MYSQL_PWD}
+      MYSQL_PORT: ${MYSQL_PORT}
+    depends_on:
+      sepsis_db:
+        condition: service_healthy
+    ports:
+      - ${APP_PORT}:8000
+    networks:
+      - sepsis_backend
+
+  sepsis_db_workbench:
+    image: dolthub/dolt-workbench:latest
+    container_name: sepsis_db_workbench
+    depends_on:
+      sepsis_db:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      DW_DB_DBNAME: ${MYSQL_DB}
+      DW_DB_PORT: ${MYSQL_PORT}
+      DW_DB_USER: ${MYSQL_USER}
+      DW_DB_PASS: ${MYSQL_PWD}
+      DW_DB_HOST: sepsis_db
+      GRAPHQLAPI_URL: http://localhost:${DW_API_PORT}/graphql
+    networks:
+      - sepsis_backend
+    ports:
+      - ${DW_PORT}:3000
+      - ${DW_API_PORT}:9002
+
+  sepsis_db:
+    image: mysql:8.0
+    container_name: sesips_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PWD}
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PWD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./sql/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
+    ports:
+      - ${MYSQL_PORT}:3306
+    networks:
+      - sepsis_backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+networks:
+  sepsis_backend:
+
+volumes:
+  mysql-data:

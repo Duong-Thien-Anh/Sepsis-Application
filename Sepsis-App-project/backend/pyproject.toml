@@ -1,0 +1,8 @@
+# formatter, linter config
+[tool.ruff]
+line-length = 50
+indent-width = 4
+
+# lsp config
+[tool.basedpyright]
+allowedUntypedLibraries = ["peewee"]
