@@ -10,36 +10,58 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+
         python = pkgs.python311;
 
-        pythonEnv = python.withPackages (ps: []);
       in
       {
         devShells.default = pkgs.mkShell {
-          name = "sepsis-python-env";
+          name = "sepsis-frontend-env";
 
           buildInputs = [
-            pythonEnv
+            python
             pkgs.uv
+            pkgs.tcl
+            pkgs.tk
+            pkgs.git
           ];
 
-          shellHook = ''
-            if [ ! -d ".venv" ]; then
-              echo "🐍 Creating virtual environment..."
-              ${python}/bin/python -m venv .venv
-              
-              .venv/bin/pip install --upgrade pip
-              .venv/bin/pip install uv
+          # Critical: Make Nix's tk/tcl libs visible to Python
+          LD_LIBRARY_PATH = "${pkgs.tcl}/lib:${pkgs.tk}/lib";
 
-              echo "📦 Installing dependencies from requirements.txt..."
-              .venv/bin/uv pip install -r requirements.txt --strict
+          shellHook = ''
+            export VENV=".venv"
+            export PYTHON="${python}/bin/python"
+
+            # These MUST run every shell entry
+            export TCL_LIBRARY="${pkgs.tcl}/lib/tcl${pkgs.tcl.version}"
+            export TK_LIBRARY="${pkgs.tk}/lib/tk${pkgs.tk.version}"
+
+            echo "Sepsis Frontend Dev Environment"
+            echo "Python: $($PYTHON --version)"
+            echo "uv:     $(${pkgs.uv}/bin/uv --version)"
+            echo "Tk:     ${pkgs.tk.version} (fixed paths)"
+
+            if [ ! -d "$VENV" ]; then
+              echo "Creating virtual environment with uv..."
+              ${pkgs.uv}/bin/uv venv $VENV --python $PYTHON --seed
+
+              echo "Installing dependencies..."
+              if [ -f "requirements.txt" ]; then
+                ${pkgs.uv}/bin/uv pip install -r requirements.txt --strict
+              else
+                echo "No requirements.txt → installing customtkinter + GUI essentials"
+                ${pkgs.uv}/bin/uv pip install customtkinter pillow matplotlib seaborn pandas
+              fi
             fi
 
-            source .venv/bin/activate
+            source $VENV/bin/activate
 
-            echo "✅ Ready! Python $(python --version)"
-            echo "   Run: uvicorn main:app --reload"
-            echo "   Or: python main.py"
+            echo "   Ready! Tkinter fully fixed."
+            echo ""
+            echo "   Run: python main.py"
+            echo "   or: uvicorn main:app --reload"
+            echo ""
           '';
         };
       });
