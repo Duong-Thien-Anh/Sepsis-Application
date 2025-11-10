@@ -1,4 +1,5 @@
-﻿DROP DATABASE IF EXISTS sepsis;
+﻿-- TODO: Viet Nam letters are still have some issues.
+DROP DATABASE IF EXISTS sepsis;
 CREATE DATABASE sepsis;
 USE sepsis;
 

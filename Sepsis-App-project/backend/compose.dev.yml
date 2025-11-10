@@ -4,6 +4,7 @@ services:
     environment:
       MYSQL_ROOT_PWD: ${MYSQL_ROOT_PWD}
       MYSQL_DB: ${MYSQL_DB}
+      MYSQL_HOST: ${MYSQL_HOST}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PWD: ${MYSQL_PWD}
       MYSQL_PORT: ${MYSQL_PORT}
@@ -27,7 +28,7 @@ services:
       DW_DB_PORT: ${MYSQL_PORT}
       DW_DB_USER: ${MYSQL_USER}
       DW_DB_PASS: ${MYSQL_PWD}
-      DW_DB_HOST: sepsis_db
+      DW_DB_HOST: ${MYSQL_HOST}
       GRAPHQLAPI_URL: http://localhost:${DW_API_PORT}/graphql
     networks:
       - sepsis_backend
@@ -37,7 +38,7 @@ services:
 
   sepsis_db:
     image: mysql:8.0
-    container_name: sesips_db
+    container_name: sepsis_db
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PWD}
