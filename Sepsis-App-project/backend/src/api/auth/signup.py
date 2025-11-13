@@ -15,7 +15,7 @@ from ...repositories import (
     account as account_repository,
 )
 
-from ..authen import checkRole
+from ...utils import jwt
 from ..response import Response
 
 
@@ -88,7 +88,7 @@ class SignUpDTO(BaseModel):
 async def signup(
     _: Annotated[
         None,
-        Security(checkRole, scopes=["admin"]),
+        Security(jwt.checkRole, scopes=["admin"]),
     ],
     dto: SignUpDTO,
 ) -> Response[None]:

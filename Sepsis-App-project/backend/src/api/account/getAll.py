@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import Security
 from pydantic import BaseModel
 
-from ..authen import checkRole
+from ...utils import jwt
 from ..response import Response
 from src.repositories import (
     account as account_repository,
@@ -36,7 +36,7 @@ class AccountResponse(BaseModel):
 async def getAll(
     _: Annotated[
         None,
-        Security(checkRole, scopes=["admin"]),
+        Security(jwt.checkRole, scopes=["admin"]),
     ],
 ) -> Response[list[AccountResponse]]:
     # TODO: just admin can use this feature

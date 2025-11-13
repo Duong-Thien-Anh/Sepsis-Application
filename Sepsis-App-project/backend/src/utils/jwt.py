@@ -2,7 +2,11 @@ from dataclasses import dataclass
 import datetime
 import logging
 from os import environ
+from typing import Annotated
+from fastapi import Header, security
 import jwt
+
+from ..repositories import account
 
 
 @dataclass
@@ -61,4 +65,45 @@ def verify(token: str) -> str:
     except Exception as e:
         raise InvalidToken(
             "Your token is invalid!"
+        )
+
+
+async def checkRole(
+    scopes: security.SecurityScopes,
+    Authorization: Annotated[
+        str | None, Header()
+    ] = None,
+) -> None:
+    if Authorization == None:
+        raise InvalidToken(
+            "Your access token not found!"
+        )
+
+    if not Authorization.startswith("Bearer"):
+        raise InvalidToken(
+            "Your access token is invalid!"
+        )
+
+    token = Authorization.split(" ", 1)[1].strip()
+    if len(token) < 2:
+        raise InvalidToken(
+            "Your access token is empty!"
+        )
+
+    user = verify(token)
+    query = await account.getFields(
+        user, (account.Account.role)
+    )
+    if query is None:
+        raise InvalidToken(
+            "Your access token is invalid!"
+        )
+    role = query[0]
+
+    if (
+        scopes.scopes
+        and role not in scopes.scopes
+    ):
+        raise InvalidToken(
+            "Not enough permissions!"
         )
