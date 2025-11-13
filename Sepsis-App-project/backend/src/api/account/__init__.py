@@ -8,6 +8,6 @@ router = APIRouter(
 )
 
 # Re-import to trigger @router functions
-from .getAll import getAll
+from .get import getAll
 
 __all__ = ["router"]

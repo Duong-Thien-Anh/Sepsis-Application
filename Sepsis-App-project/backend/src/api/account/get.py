@@ -1,6 +1,5 @@
 from datetime import date, datetime
 import http
-from typing import Annotated
 from fastapi import Security
 from pydantic import BaseModel
 
@@ -32,13 +31,15 @@ class AccountResponse(BaseModel):
         from_attributes = True
 
 
-@router.get("")
-async def getAll(
-    _: Annotated[
-        None,
+@router.get(
+    "",
+    dependencies=[
         Security(jwt.checkRole, scopes=["admin"]),
     ],
-) -> Response[list[AccountResponse]]:
+)
+async def getAll() -> Response[
+    list[AccountResponse]
+]:
     # TODO: just admin can use this feature
     return Response(
         http.HTTPStatus.OK,
