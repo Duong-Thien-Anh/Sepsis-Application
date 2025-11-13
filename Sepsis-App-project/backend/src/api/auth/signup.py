@@ -1,28 +1,47 @@
+from dataclasses import dataclass
 import http
 from os import environ
 import re
+from typing import Annotated
 import bcrypt
+from fastapi import Security
 from pydantic import (
     BaseModel,
-    Field,
     field_validator,
 )
 
-from ...error import (
-    InvalidEmailFormat,
-    InvalidPhoneFormat,
-)
 
-from ..response import Response
 from ...repositories import (
     account as account_repository,
 )
+
+from ..authen import checkRole
+from ..response import Response
+
 
 from . import router
 
 VIETNAM_PHONE_REGEX = re.compile(
     r"^0[1-9][0-9]{8,9}$"
 )
+
+
+# ---- Exceptions ----
+@dataclass
+class InvalidEmailFormat(Exception):
+    msg: str
+
+
+@dataclass
+class InvalidPhoneFormat(Exception):
+    pass
+
+
+class UserExisted(Exception):
+    pass
+
+
+# ---------------------
 
 
 class SignUpDTO(BaseModel):
@@ -67,6 +86,10 @@ class SignUpDTO(BaseModel):
 
 @router.post("")
 async def signup(
+    _: Annotated[
+        None,
+        Security(checkRole, scopes=["admin"]),
+    ],
     dto: SignUpDTO,
 ) -> Response[None]:
     # TODO: just admin can use this feature
