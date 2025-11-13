@@ -10,7 +10,7 @@ from os import environ
 from dotenv import load_dotenv
 
 from . import app
-from .api import account
+from .api import account, auth
 from .repositories import base
 
 # Load `.env` when the project is running
@@ -25,3 +25,4 @@ if (
 base.BaseModel._meta.database.connect()
 
 app.include_router(account.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
