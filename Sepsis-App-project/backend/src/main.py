@@ -6,10 +6,11 @@ sys.path.insert(
     0, str(Path(__file__).resolve().parent.parent)
 )
 
+from fastapi.middleware.cors import CORSMiddleware
 from os import environ
 from dotenv import load_dotenv
 
-from . import app
+from . import app, error
 from .api import account, auth
 from .repositories import base
 
@@ -21,6 +22,14 @@ if (
 ):
     _ = load_dotenv(override=True)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=environ.get(
+        "CLIENT_URL", "client_url"
+    ),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 base.BaseModel._meta.database.connect()
 
