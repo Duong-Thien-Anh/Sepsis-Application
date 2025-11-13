@@ -1,12 +1,15 @@
 from datetime import date, datetime
 import http
+from typing import Annotated
+from fastapi import Security
 from pydantic import BaseModel
+
+from ..authen import checkRole
 from ..response import Response
 from src.repositories import (
     account as account_repository,
 )
-
-from . import router, log
+from . import router
 
 
 class AccountResponse(BaseModel):
@@ -30,20 +33,24 @@ class AccountResponse(BaseModel):
 
 
 @router.get("")
-def getAll() -> Response[list[AccountResponse]]:
+async def getAll(
+    _: Annotated[
+        None,
+        Security(checkRole, scopes=["admin"]),
+    ],
+) -> Response[list[AccountResponse]]:
     # TODO: just admin can use this feature
     return Response(
         http.HTTPStatus.OK,
-        getAllInternal(),
-        "Get all account successfully!",
+        await getAllInternal(),
+        "Lấy danh sách tài khoản thành công!",
     )
 
 
-def getAllInternal() -> list[AccountResponse]:
-    accounts = account_repository.getAll()
-
-    log.info(accounts)
-
+async def getAllInternal() -> list[
+    AccountResponse
+]:
+    accounts = await account_repository.getAll()
     return [
         AccountResponse.model_validate(acc)
         for acc in accounts
