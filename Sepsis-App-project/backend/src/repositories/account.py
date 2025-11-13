@@ -5,15 +5,10 @@ from peewee import (
     CharField,
     DateField,
     DateTimeField,
-    Field,
     OperationalError,
     TextField,
 )
 
-from ..error import (
-    InvalidEmailFormat,
-    UserExisted,
-)
 
 from .base import BaseModel
 from datetime import date, datetime
