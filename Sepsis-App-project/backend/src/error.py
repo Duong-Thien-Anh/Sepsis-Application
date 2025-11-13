@@ -1,11 +1,11 @@
 #! Mapping `exceptions` -> `responses`
 from dataclasses import asdict
 import http
-from fastapi import Request
+from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 
 # ---- Error Declaration ----
-from .utils.jwt import InvalidToken
+from .utils.jwt import Forbidden, InvalidToken
 from .api.auth.signup import (
     InvalidEmailFormat,
     InvalidPhoneFormat,
@@ -58,9 +58,42 @@ async def ic_error_handler(
 
 @app.exception_handler(InvalidToken)
 async def it_error_handler(
-    _: Request, exc: InvalidToken
+    _: Request, exc: Forbidden
 ) -> JSONResponse:
     return await response_401(exc.msg)
+
+
+@app.exception_handler(HTTPException)
+async def http_error_handler(
+    _: Request, exc: HTTPException
+) -> JSONResponse:
+    """
+    Handle some HTTP exceptions from FastAPI features (HTTPBearer(), ...)
+    """
+    if exc.status_code == 403:
+        return await response_403(exc.detail)
+    else:
+        return await response_500(exc.detail)
+
+
+@app.exception_handler(Forbidden)
+async def f_error_handler(
+    _: Request, exc: Forbidden
+) -> JSONResponse:
+    return await response_403(exc.msg)
+
+
+# Mapping our `Response` to `JSONResponse`
+async def response_500(msg: str) -> JSONResponse:
+    error_response = Response[None](
+        status=http.HTTPStatus.INTERNAL_SERVER_ERROR,
+        data=None,
+        message=msg,
+    )
+    return JSONResponse(
+        status_code=error_response.status.value,
+        content=asdict(error_response),
+    )
 
 
 async def response_400(msg: str) -> JSONResponse:
@@ -78,6 +111,18 @@ async def response_400(msg: str) -> JSONResponse:
 async def response_401(msg: str) -> JSONResponse:
     error_response = Response[None](
         status=http.HTTPStatus.UNAUTHORIZED,
+        data=None,
+        message=msg,
+    )
+    return JSONResponse(
+        status_code=error_response.status.value,
+        content=asdict(error_response),
+    )
+
+
+async def response_403(msg: str) -> JSONResponse:
+    error_response = Response[None](
+        status=http.HTTPStatus.FORBIDDEN,
         data=None,
         message=msg,
     )
