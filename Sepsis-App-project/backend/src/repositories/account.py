@@ -1,10 +1,11 @@
+from typing import Any
 from peewee import (
     AutoField,
     BitField,
     CharField,
     DateField,
     DateTimeField,
-    IntegrityError,
+    Field,
     OperationalError,
     TextField,
 )
@@ -39,7 +40,7 @@ class Account(BaseModel):
             return "Account"
 
 
-def insertOne(
+async def insertOne(
     username: str,
     password_hash: str,
     full_name: str,
@@ -69,5 +70,22 @@ def insertOne(
         print(f"Error message: {e.args[1]}")
 
 
-def getAll() -> list[Account]:
+async def getAll() -> list[Account]:
     return list(Account.select())
+
+
+async def getFields(
+    username: str, fields: tuple[Any, ...]
+) -> tuple[Any, ...]:
+    """
+    Get `fields` of an account by `username`.
+    # Example:
+    * `getOptional(username, (Account.password_hash))`: get hashed password of an account.
+    * `getOptional(username, (Account.account_id, Account.password_hash))`: get id and hashed password of an account.
+    """
+    return (
+        Account.select(fields)
+        .where(Account.username == username)
+        .tuples()
+        .first()
+    )
