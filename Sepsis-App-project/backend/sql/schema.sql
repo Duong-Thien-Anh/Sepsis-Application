@@ -16,7 +16,7 @@ CREATE TABLE Account (
     full_name VARCHAR(255),
     email VARCHAR(255),
     phone VARCHAR(20),
-    role VARCHAR(50) DEFAULT 'user',
+    role ENUM('user', 'admin') DEFAULT 'user',
     status VARCHAR(50) DEFAULT 'active',
     created_date DATE DEFAULT (CURRENT_DATE),
     last_login DATETIME,
