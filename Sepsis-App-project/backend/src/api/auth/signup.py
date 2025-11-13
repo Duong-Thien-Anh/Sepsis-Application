@@ -2,7 +2,6 @@ from dataclasses import dataclass
 import http
 from os import environ
 import re
-from typing import Annotated
 import bcrypt
 from fastapi import Security
 from pydantic import (
@@ -50,8 +49,6 @@ class SignUpDTO(BaseModel):
     full_name: str
     email: str
     phone: str
-    role: str
-    status: str
     note: str
 
     @field_validator("email")
@@ -84,15 +81,15 @@ class SignUpDTO(BaseModel):
         return v
 
 
-@router.post("")
-async def signup(
-    _: Annotated[
-        None,
+@router.post(
+    "",
+    dependencies=[
         Security(jwt.checkRole, scopes=["admin"]),
     ],
+)
+async def signup(
     dto: SignUpDTO,
 ) -> Response[None]:
-    # TODO: just admin can use this feature
     await signupInternal(dto)
     return Response(
         http.HTTPStatus.OK,
@@ -111,7 +108,7 @@ async def signupInternal(dto: SignUpDTO) -> None:
         ),
     )
 
-    account_repository.insertOne(
+    await account_repository.insertOne(
         dto.username,
         hashed.decode("utf-8"),
         dto.full_name,
