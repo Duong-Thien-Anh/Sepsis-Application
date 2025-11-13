@@ -8,6 +8,9 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PWD: ${MYSQL_PWD}
       MYSQL_PORT: ${MYSQL_PORT}
+
+      APP_HASH_ROUND: ${APP_HASH_ROUND}
+      APP_SECRET: ${APP_SECRET}
     depends_on:
       sepsis_db:
         condition: service_healthy
