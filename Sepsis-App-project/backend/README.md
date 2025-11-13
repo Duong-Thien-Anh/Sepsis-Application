@@ -23,10 +23,11 @@ fastapi dev src/main.py
 ```
 src/
 ├── main.py                  # Application entrypoint
-├── api/                     # Everything API-related (controllers = routers, services = business logic)
+├── error.py                 # Exception mapping to response
+├── api/                     # Everything API-related (controllers = routers, services = business logic, exceptions)
 │   ├── __init__.py
 │   └── account/             # Features based
-│        ├ getAll.py         # All routes related to get accounts (They can be get all accounts, get a account, ...)
+│        ├ get.py         # All routes related to get accounts (They can be get all accounts, get a account, ...)
 │        └ ...
 │
 ├── repositories/            # Everything Database-related (Table definitions = Models, Query)
