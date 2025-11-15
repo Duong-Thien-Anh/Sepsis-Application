@@ -49,7 +49,9 @@ async def loginInternal(
     username: str, pwd: str
 ) -> None:
     result = await account.getFields(
-        username, (account.Account.password_hash)
+        username,
+        (account.Account.password_hash),
+        False,
     )
 
     if result is None:

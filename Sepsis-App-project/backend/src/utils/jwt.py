@@ -116,7 +116,9 @@ async def checkRole(
 ) -> None:
     user = verify(credentials.credentials)
     query = await account.getFields(
-        user, (account.Account.role)
+        user,
+        (account.Account.role),
+        False,
     )
     if query is None:
         raise InvalidToken(

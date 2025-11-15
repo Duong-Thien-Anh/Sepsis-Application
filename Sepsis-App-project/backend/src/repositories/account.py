@@ -70,17 +70,32 @@ async def getAll() -> list[Account]:
 
 
 async def getFields(
-    username: str, fields: tuple[Any, ...]
+    username_or_email: str,
+    fields: tuple[Any, ...],
+    is_email: bool,
 ) -> tuple[Any, ...]:
     """
     Get `fields` of an account by `username`.
     # Example:
-    * `getOptional(username, (Account.password_hash))`: get hashed password of an account.
-    * `getOptional(username, (Account.account_id, Account.password_hash))`: get id and hashed password of an account.
+    * `getFields(username, (Account.password_hash), False)`: get hashed password of an account by `username`.
+    * `getFields(email, (Account.account_id, Account.password_hash), True)`: get id and hashed password of an account by `email`.
     """
-    return (
-        Account.select(fields)
-        .where(Account.username == username)
-        .tuples()
-        .first()
-    )
+    if not is_email:
+        return (
+            Account.select(fields)
+            .where(
+                Account.username
+                == username_or_email
+            )
+            .tuples()
+            .first()
+        )
+    else:
+        return (
+            Account.select(fields)
+            .where(
+                Account.email == username_or_email
+            )
+            .tuples()
+            .first()
+        )
