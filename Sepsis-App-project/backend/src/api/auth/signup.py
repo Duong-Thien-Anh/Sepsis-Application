@@ -81,11 +81,16 @@ class SignUpDTO(BaseModel):
         return v
 
 
+dependencies = []
+if environ.get("ENV", "DEV") == "PRODUCTION":
+    dependencies = [
+        Security(jwt.checkRole, scopes=["admin"]),
+    ]
+
+
 @router.post(
     "",
-    dependencies=[
-        Security(jwt.checkRole, scopes=["admin"]),
-    ],
+    dependencies=dependencies,
 )
 async def signup(
     dto: SignUpDTO,
