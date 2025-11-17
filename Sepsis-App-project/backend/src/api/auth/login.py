@@ -1,8 +1,8 @@
 from dataclasses import dataclass
+from datetime import datetime
 import http
-import logging
 import bcrypt
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from pydantic import BaseModel
 
 from ...state import login_limiter
@@ -48,9 +48,11 @@ class LoginDTO(BaseModel):
 @router.post("/login")
 async def login(
     dto: LoginDTO,
+    request: Request,
 ) -> Response[TokenPair]:
+    host = request.client.host
     await loginInternal(
-        dto.username, dto.password
+        dto.username, dto.password, host
     )
     return Response(
         http.HTTPStatus.OK,
@@ -60,7 +62,7 @@ async def login(
 
 
 async def loginInternal(
-    username: str, pwd: str
+    username: str, pwd: str, host: str
 ) -> None:
     result = await account.getFields(
         username,
@@ -87,6 +89,16 @@ async def loginInternal(
             raise InvalidCredentials(
                 "Mật khẩu không đúng!"
             )
+
+        # Update information each login time
+        await account.updateFields(
+            username,
+            (
+                account.Account.last_login,
+                account.Account.last_login_ip,
+            ),
+            (datetime.today(), host),
+        )
     except Exception as e:
         login_limiter.increase(username)
         raise e
