@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Any
 from peewee import (
     AutoField,
@@ -5,13 +6,13 @@ from peewee import (
     CharField,
     DateField,
     DateTimeField,
+    Field,
     OperationalError,
     TextField,
 )
 
 
 from .base import BaseModel
-from datetime import date, datetime
 
 
 class Account(BaseModel):
@@ -50,14 +51,7 @@ async def insertOne(
             full_name=full_name,
             email=email,
             phone=phone,
-            status="new",
-            role="member",
-            created_date=date.today(),
-            last_login=datetime.today(),
             note=note,
-            last_login_ip="1.1.1.1",
-            is_2fa_enabled=False,
-            login_method="normal",
         )
     except OperationalError as e:
         # TODO: handle error
@@ -99,3 +93,32 @@ async def getFields(
             .tuples()
             .first()
         )
+
+
+async def updateFields(
+    usr: str,
+    fields: Iterable[Field],
+    values: Iterable[Any],
+) -> None:
+    """
+    Update *only* the supplied fields on an existing Peewee instance.
+
+    # Example
+    ```python
+    updateFields(
+        (Account.password, Account.role),
+        ("super_secret_password", "member")
+    )
+    ```
+    """
+    data: dict[Field, Any] = dict(
+        zip(fields, values)
+    )
+    data = {
+        field.name: value
+        for field, value in zip(fields, values)
+    }
+    Account.update(**data).where(
+        Account.username == usr
+    ).execute()
+    return
