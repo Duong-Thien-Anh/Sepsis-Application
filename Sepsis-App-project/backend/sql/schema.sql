@@ -27,10 +27,9 @@ CREATE TABLE Account (
 );
 
 -- ============= Employee Table =============
-CREATE TABLE Profile (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE Employee (
+    code CHAR(10) PRIMARY KEY,
     account_id INTEGER UNIQUE NOT NULL,
-    employee_code VARCHAR(20) NOT NULL,
     full_name VARCHAR(255) NOT NULL,
     date_of_birth DATE,
     gender ENUM('Male', 'Female', 'Other'),
@@ -79,9 +78,9 @@ CREATE TABLE MedicalHistoryRecord (
     record_type VARCHAR(100),
     description TEXT,
     patient_id VARCHAR(20) NOT NULL,
-    employee_id VARCHAR(20) NOT NULL,
+    employee_code CHAR(20) NOT NULL,
     FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
-    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) ON DELETE RESTRICT
+    FOREIGN KEY (employee_code) REFERENCES Employee(code) ON DELETE RESTRICT
 );
 
 -- ============= Diagnosis =============
@@ -131,9 +130,9 @@ CREATE TABLE RecallAppointment (
     email_status VARCHAR(50),
     note TEXT,
     patient_id VARCHAR(20) NOT NULL,
-    employee_id VARCHAR(20) NOT NULL,
+    employee_code CHAR(20) NOT NULL,
     FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
-    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) ON DELETE RESTRICT
+    FOREIGN KEY (employee_code) REFERENCES Employee(code) ON DELETE RESTRICT
 );
 
 -- ============= ActivityLog =============
@@ -145,8 +144,8 @@ CREATE TABLE ActivityLog (
     ip_address VARCHAR(50),
     affected_object_type VARCHAR(100),
     affected_object_id VARCHAR(20),
-    username_account VARCHAR(100) NOT NULL,
-    FOREIGN KEY (username_account) REFERENCES Account(username) ON DELETE CASCADE
+    account_id INTEGER NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES Account(id) ON DELETE CASCADE
 );
 
 -- =============================================
@@ -159,15 +158,13 @@ ADD CONSTRAINT chk_EmailFormat
 CHECK (email REGEXP '^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$');
 
 -- Phone: only digits, 9-11 chars, start with 0
-ALTER TABLE Account 
+ALTER TABLE Account
 ADD CONSTRAINT chk_PhoneFormat 
 CHECK (phone REGEXP '^0[0-9]{8,10}$');
 
 -- Same for Patient & Employee
 ALTER TABLE Patient 
 ADD CONSTRAINT chk_patient_phone CHECK (phone REGEXP '^0[0-9]{8,10}$');
-ALTER TABLE Employee 
-ADD CONSTRAINT chk_employee_phone CHECK (phone REGEXP '^0[0-9]{8,10}$');
 
 -- =============================================
 -- TRIGGERS (MySQL syntax)
@@ -231,11 +228,5 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Phone or email already exists.';
     END IF;
 END$$
-
--- 5. Auto update updated_at in Patient
-CREATE TRIGGER trg_UpdatePatientTimestamp
-BEFORE UPDATE ON Patient
-FOR EACH ROW
-SET NEW.updated_at = NOW()$$
 
 DELIMITER ;
