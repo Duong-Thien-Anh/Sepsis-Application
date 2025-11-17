@@ -8,32 +8,32 @@ SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 SET collation_connection = utf8mb4_unicode_ci;
 
--- ============= Employee Table =============
+-- ============= Account Table =============
 CREATE TABLE Account (
-    account_id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255),
-    full_name VARCHAR(255),
-    email VARCHAR(255),
     phone VARCHAR(20),
+    email VARCHAR(255),
     role ENUM('user', 'admin') DEFAULT 'user',
-    status VARCHAR(50) DEFAULT 'active',
+    status VARCHAR(50) DEFAULT 'inactive',
     created_date DATE DEFAULT (CURRENT_DATE),
     last_login DATETIME,
     note TEXT,
     is_2fa_enabled TINYINT(1) DEFAULT 0,
+    is_enabled TINYINT(1) DEFAULT 1,
     last_login_ip VARCHAR(100),
     login_method VARCHAR(50) DEFAULT 'password'
 );
 
 -- ============= Employee Table =============
-CREATE TABLE Employee (
-    employee_id VARCHAR(20) PRIMARY KEY,
-    full_name VARCHAR(255),
+CREATE TABLE Profile (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    account_id INTEGER UNIQUE NOT NULL,
+    employee_code VARCHAR(20) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
     date_of_birth DATE,
     gender ENUM('Male', 'Female', 'Other'),
-    phone VARCHAR(20),
-    email VARCHAR(255),
     address TEXT,
     position VARCHAR(100),
     department VARCHAR(100),
@@ -45,10 +45,10 @@ CREATE TABLE Employee (
     emergency_contact_relation VARCHAR(50),
     emergency_contact_phone VARCHAR(20),
     photo_path VARCHAR(255),
-    username_account VARCHAR(100) UNIQUE,
-    CONSTRAINT fk_username_account 
-        FOREIGN KEY (username_account) REFERENCES Account(username)
-        ON DELETE SET NULL
+
+    CONSTRAINT fk_id_account 
+        FOREIGN KEY (account_id) REFERENCES Account(id)
+        ON DELETE CASCADE
 );
 
 -- ============= Patient Table =============
