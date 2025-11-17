@@ -15,7 +15,6 @@ class AccountResponse(BaseModel):
     account_id: int
     username: str
     password_hash: str
-    full_name: str
     email: str
     phone: str
     role: str
