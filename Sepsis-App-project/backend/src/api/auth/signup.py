@@ -89,7 +89,7 @@ if environ.get("ENV", "DEV") == "PRODUCTION":
 
 
 @router.post(
-    "",
+    "/signup",
     dependencies=dependencies,
 )
 async def signup(
