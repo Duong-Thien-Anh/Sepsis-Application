@@ -11,10 +11,12 @@ from pydantic import (
 
 
 from ...repositories import (
+    base,
     account as account_repository,
+    profile as profile_repository,
 )
 
-from ...utils import jwt
+from ...utils import jwt, employee_code
 from ..response import Response
 
 
@@ -33,10 +35,6 @@ class InvalidEmailFormat(Exception):
 
 @dataclass
 class InvalidPhoneFormat(Exception):
-    pass
-
-
-class UserExisted(Exception):
     pass
 
 
@@ -113,11 +111,44 @@ async def signupInternal(dto: SignUpDTO) -> None:
         ),
     )
 
-    await account_repository.insertOne(
-        dto.username,
-        hashed.decode("utf-8"),
-        dto.full_name,
-        dto.email,
-        dto.phone,
-        dto.note,
+    with base.db.atomic():
+        await account_repository.insertOne(
+            dto.username,
+            hashed.decode("utf-8"),
+            dto.email,
+            dto.phone,
+            dto.note,
+        )
+
+        account_id = (
+            await account_repository.getFields(
+                dto.username,
+                (account_repository.Account.id),
+                False,
+            )
+        )[0]
+
+        employee_code = generateEmployeeCode()
+
+        await profile_repository.insertOne(
+            account_id,
+            employee_code,
+            dto.full_name,
+        )
+
+
+def generateEmployeeCode() -> str:
+    """Loop and generate until the code is not duplicated."""
+    code = employee_code.generateWithPrefix("EMP")
+    code_existed = profile_repository.checkCode(
+        code
     )
+
+    while code_existed:
+        code = employee_code.generateWithPrefix(
+            "EMP"
+        )
+        code_existed = (
+            profile_repository.checkCode(code)
+        )
+    return code
