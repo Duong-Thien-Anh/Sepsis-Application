@@ -1,13 +1,14 @@
 from collections.abc import Iterable
+from dataclasses import dataclass
 from typing import Any
+from fastapi import HTTPException
 from peewee import (
     AutoField,
-    BitField,
+    BooleanField,
     CharField,
     DateField,
     DateTimeField,
     Field,
-    OperationalError,
     TextField,
 )
 
@@ -15,11 +16,20 @@ from peewee import (
 from .base import BaseModel
 
 
+@dataclass
+class UserExisted(HTTPException):
+    msg: str = "Người dùng đã tồn tại."
+
+    def __post_init__(self):
+        super().__init__(
+            status_code=400, detail=self.msg
+        )
+
+
 class Account(BaseModel):
-    account_id = AutoField()
+    id = AutoField()
     username = CharField(max_length=100)
     password_hash = CharField()
-    full_name = CharField()
     email = CharField()
     phone = CharField(max_length=20)
     role = CharField(max_length=50)
@@ -27,7 +37,8 @@ class Account(BaseModel):
     created_date = DateField()
     last_login = DateTimeField()
     note = TextField()
-    is_2fa_enabled = BitField()
+    is_2fa_enabled = BooleanField()
+    is_enabled = BooleanField()
     last_login_ip = CharField(max_length=100)
     login_method = CharField(max_length=50)
 
@@ -39,24 +50,21 @@ class Account(BaseModel):
 async def insertOne(
     username: str,
     password_hash: str,
-    full_name: str,
     email: str,
     phone: str,
     note: str,
 ) -> None:
-    try:
-        Account.create(
-            username=username,
-            password_hash=password_hash,
-            full_name=full_name,
-            email=email,
-            phone=phone,
-            note=note,
-        )
-    except OperationalError as e:
-        # TODO: handle error
-        print(f"Error code: {e.args[0]}")
-        print(f"Error message: {e.args[1]}")
+    _, created = Account.get_or_create(
+        username=username,
+        defaults={
+            "password_hash": password_hash,
+            "email": email,
+            "phone": phone,
+            "note": note,
+        },
+    )
+    if not created:
+        raise UserExisted()
 
 
 async def getAll() -> list[Account]:
