@@ -75,6 +75,7 @@ def create_token_pair(usr: str) -> TokenPair:
 
 
 def verify(token: str) -> str:
+    """Ensure the token is valid then return `username`."""
     key = environ.get("APP_SECRET")
 
     if key is None:
@@ -131,3 +132,12 @@ async def checkRole(
         and role not in scopes.scopes
     ):
         raise Forbidden("Not enough permissions!")
+
+
+def getCurrentUser(
+    credentials: Annotated[
+        security.HTTPAuthorizationCredentials,
+        Security(security.HTTPBearer()),
+    ],
+) -> str:
+    return verify(credentials.credentials)

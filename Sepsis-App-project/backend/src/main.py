@@ -11,7 +11,7 @@ from os import environ
 from dotenv import load_dotenv
 
 from . import app, error
-from .api import account, auth
+from .api import account, auth, profile
 from .repositories import base
 
 # Load `.env` when the project is running
@@ -21,6 +21,7 @@ if (
     or Path(".env").exists()
 ):
     _ = load_dotenv(override=True)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,3 +36,4 @@ base.BaseModel._meta.database.connect()
 
 app.include_router(account.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
+app.include_router(profile.router, prefix="/api")
