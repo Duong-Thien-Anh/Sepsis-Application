@@ -1,7 +1,11 @@
 from dataclasses import dataclass
 import http
+import logging
 import bcrypt
+from fastapi import HTTPException
 from pydantic import BaseModel
+
+from ...state import login_limiter
 from ...repositories import account
 from ...utils.jwt import (
     TokenPair,
@@ -21,6 +25,16 @@ class InvalidCredentials(Exception):
     """
 
     msg: str
+
+
+@dataclass
+class ReachedLoginLimit(HTTPException):
+    msg: str = "Bạn đã đăng nhập sai nhiều lần, vui lòng thử lại sau 5 phút."
+
+    def __post_init__(self):
+        super().__init__(
+            status_code=400, detail=self.msg
+        )
 
 
 # ---------------------
@@ -59,15 +73,20 @@ async def loginInternal(
             "Không tìm thấy người dùng!"
         )
 
-    hashed = result[0]
-    is_verified = bcrypt.checkpw(
-        pwd.encode("utf-8"),
-        hashed.encode("utf-8"),
-    )
+    try:
+        if login_limiter.isLimited(username):
+            raise ReachedLoginLimit()
 
-    if not is_verified:
-        raise InvalidCredentials(
-            "Mật khẩu không đúng!"
+        hashed = result[0]
+        is_verified = bcrypt.checkpw(
+            pwd.encode("utf-8"),
+            hashed.encode("utf-8"),
         )
 
-    return
+        if not is_verified:
+            raise InvalidCredentials(
+                "Mật khẩu không đúng!"
+            )
+    except Exception as e:
+        login_limiter.increase(username)
+        raise e
