@@ -9,7 +9,6 @@ from .utils.jwt import Forbidden, InvalidToken
 from .api.auth.signup import (
     InvalidEmailFormat,
     InvalidPhoneFormat,
-    UserExisted,
 )
 from .api.auth.login import InvalidCredentials
 from .api.response import Response
@@ -40,15 +39,6 @@ async def ipf_error_handler(
     )
 
 
-@app.exception_handler(UserExisted)
-async def ue_error_handler(
-    _: Request, _1: UserExisted
-) -> JSONResponse:
-    return await response_400(
-        "Tên người dùng đã tồn tại!"
-    )
-
-
 @app.exception_handler(InvalidCredentials)
 async def ic_error_handler(
     _: Request, exc: InvalidCredentials
@@ -67,11 +57,12 @@ async def it_error_handler(
 async def http_error_handler(
     _: Request, exc: HTTPException
 ) -> JSONResponse:
-    """
-    Handle some HTTP exceptions from FastAPI features (HTTPBearer(), ...)
-    """
     if exc.status_code == 403:
         return await response_403(exc.detail)
+    elif exc.status_code == 401:
+        return await response_401(exc.detail)
+    elif exc.status_code == 400:
+        return await response_400(exc.detail)
     else:
         return await response_500(exc.detail)
 
