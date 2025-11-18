@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 log = logging.getLogger("Account Controller")
 router = APIRouter(
-    prefix="/users", tags=["Accounts"]
+    prefix="/accounts", tags=["Accounts"]
 )
 
 # Re-import to trigger @router functions

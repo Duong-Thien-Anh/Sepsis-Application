@@ -3,7 +3,7 @@ from fastapi import APIRouter
 
 
 router = APIRouter(
-    prefix="/profile", tags=["Profile"]
+    prefix="/profiles", tags=["Profile"]
 )
 
 # Re-import to trigger @router functions
