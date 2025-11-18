@@ -52,7 +52,7 @@ CREATE TABLE Profile(
 
 -- ============= Patient Table =============
 CREATE TABLE Patient (
-    patient_id VARCHAR(20) PRIMARY KEY,
+    code VARCHAR(15) PRIMARY KEY,
     full_name VARCHAR(255),
     date_of_birth DATE,
     gender ENUM('Male', 'Female', 'Other'),
@@ -77,9 +77,9 @@ CREATE TABLE MedicalHistoryRecord (
     record_date DATE,
     record_type VARCHAR(100),
     description TEXT,
-    patient_id VARCHAR(20) NOT NULL,
+    patient_code VARCHAR(20) NOT NULL,
     employee_code CHAR(20) NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
+    FOREIGN KEY (patient_code) REFERENCES Patient(code) ON DELETE CASCADE,
     FOREIGN KEY (employee_code) REFERENCES Profile(employee_code) ON DELETE RESTRICT
 );
 
@@ -129,9 +129,9 @@ CREATE TABLE RecallAppointment (
     message_content TEXT,
     email_status VARCHAR(50),
     note TEXT,
-    patient_id VARCHAR(20) NOT NULL,
+    patient_code VARCHAR(20) NOT NULL,
     employee_code CHAR(20) NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
+    FOREIGN KEY (patient_code) REFERENCES Patient(code) ON DELETE CASCADE,
     FOREIGN KEY (employee_code) REFERENCES Profile(employee_code) ON DELETE RESTRICT
 );
 
@@ -181,7 +181,7 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Không được phép xóa tài khoản ADMIN.';
     END IF;
     
-    IF EXISTS (SELECT 1 FROM Profile WHERE username_account = OLD.username) THEN
+    IF EXISTS (SELECT 1 FROM Profile WHERE account_id = OLD.id) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Không được xóa tài khoản đang liên kết với nhân viên.';
     END IF;
 END$$
@@ -197,24 +197,24 @@ BEGIN
 END$$
 
 -- 3. Log when insert Patient
-CREATE TRIGGER trg_LogInsertPatient
-AFTER INSERT ON Patient
-FOR EACH ROW
-BEGIN
-    INSERT INTO ActivityLog (
-        log_id, timestamp, activity_type, description,
-        ip_address, affected_object_type, affected_object_id, username_account
-    ) VALUES (
-        CONCAT('LOG', LPAD(FLOOR(RAND() * 99999), 5, '0')),
-        NOW(),
-        'Insert',
-        CONCAT('New patient added: ', NEW.full_name),
-        '127.0.0.1',
-        'Patient',
-        NEW.patient_id,
-        'system'
-    );
-END$$
+-- CREATE TRIGGER trg_LogInsertPatient
+-- AFTER INSERT ON Patient
+-- FOR EACH ROW
+-- BEGIN
+--     INSERT INTO ActivityLog (
+--         log_id, timestamp, activity_type, description,
+--         ip_address, affected_object_type, affected_object_id, account_id
+--     ) VALUES (
+--         CONCAT('LOG', LPAD(FLOOR(RAND() * 99999), 5, '0')),
+--         NOW(),
+--         'Insert',
+--         CONCAT('New patient added: ', NEW.full_name),
+--         '127.0.0.1',
+--         'Patient',
+--         NEW.code,
+--         -1
+--     );
+-- END$$
 
 -- 4. Prevent duplicate phone/email in Patient
 CREATE TRIGGER trg_UniquePhoneEmailPatient

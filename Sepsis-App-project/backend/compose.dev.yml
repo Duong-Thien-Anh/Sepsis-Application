@@ -19,6 +19,7 @@ services:
     depends_on:
       sepsis_db:
         condition: service_healthy
+    restart: unless-stopped
     ports:
       - ${APP_PORT}:8000
     networks:
