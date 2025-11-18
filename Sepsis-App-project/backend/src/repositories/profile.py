@@ -28,7 +28,7 @@ class ProfileExisted(HTTPException):
 class Profile(BaseModel):
     employee_code = CharField(primary_key=True)
     account_id = ForeignKeyField(
-        Account, field=Account.id
+        Account, field=Account.id, lazy_load=False
     )
     full_name = CharField()
     date_of_birth = DateField()

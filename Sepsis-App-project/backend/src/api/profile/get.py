@@ -18,6 +18,7 @@ from . import router
 
 class ProfileResponse(BaseModel):
     employee_code: str
+    account_id: int
     full_name: str
     date_of_birth: datetime | None
     gender: str | None
