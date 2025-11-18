@@ -11,7 +11,7 @@ from os import environ
 from dotenv import load_dotenv
 
 from . import app, error
-from .api import account, auth, profile, patient
+from .api import account, auth, employee, patient
 from .repositories import base
 
 # Load `.env` when the project is running
@@ -36,5 +36,5 @@ base.BaseModel._meta.database.connect()
 
 app.include_router(account.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
-app.include_router(profile.router, prefix="/api")
+app.include_router(employee.router, prefix="/api")
 app.include_router(patient.router, prefix="/api")
