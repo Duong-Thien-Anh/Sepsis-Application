@@ -12,7 +12,7 @@ from . import router
 
 
 class AccountResponse(BaseModel):
-    account_id: int
+    id: int
     username: str
     password_hash: str
     email: str
