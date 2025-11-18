@@ -26,9 +26,9 @@ CREATE TABLE Account (
     login_method VARCHAR(50) DEFAULT 'password'
 );
 
--- ============= Employee Table =============
-CREATE TABLE Employee (
-    code CHAR(10) PRIMARY KEY,
+-- ============= Profile Table =============
+CREATE TABLE Profile(
+    employee_code CHAR(10) PRIMARY KEY,
     account_id INTEGER UNIQUE NOT NULL,
     full_name VARCHAR(255) NOT NULL,
     date_of_birth DATE,
@@ -80,7 +80,7 @@ CREATE TABLE MedicalHistoryRecord (
     patient_id VARCHAR(20) NOT NULL,
     employee_code CHAR(20) NOT NULL,
     FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
-    FOREIGN KEY (employee_code) REFERENCES Employee(code) ON DELETE RESTRICT
+    FOREIGN KEY (employee_code) REFERENCES Profile(employee_code) ON DELETE RESTRICT
 );
 
 -- ============= Diagnosis =============
@@ -132,7 +132,7 @@ CREATE TABLE RecallAppointment (
     patient_id VARCHAR(20) NOT NULL,
     employee_code CHAR(20) NOT NULL,
     FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
-    FOREIGN KEY (employee_code) REFERENCES Employee(code) ON DELETE RESTRICT
+    FOREIGN KEY (employee_code) REFERENCES Profile(employee_code) ON DELETE RESTRICT
 );
 
 -- ============= ActivityLog =============
@@ -162,7 +162,7 @@ ALTER TABLE Account
 ADD CONSTRAINT chk_PhoneFormat 
 CHECK (phone REGEXP '^0[0-9]{8,10}$');
 
--- Same for Patient & Employee
+-- Same for Patient
 ALTER TABLE Patient 
 ADD CONSTRAINT chk_patient_phone CHECK (phone REGEXP '^0[0-9]{8,10}$');
 
@@ -181,7 +181,7 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Không được phép xóa tài khoản ADMIN.';
     END IF;
     
-    IF EXISTS (SELECT 1 FROM Employee WHERE username_account = OLD.username) THEN
+    IF EXISTS (SELECT 1 FROM Profile WHERE username_account = OLD.username) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Không được xóa tài khoản đang liên kết với nhân viên.';
     END IF;
 END$$
