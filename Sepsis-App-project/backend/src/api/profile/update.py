@@ -5,10 +5,12 @@ from typing import Any
 from fastapi import Security
 from pydantic import BaseModel
 
+
 from ...utils.jwt import checkRole
 
 from ...repositories import profile
 
+from .. import Gender
 from ..response import Response
 
 from . import router
@@ -18,7 +20,7 @@ class UpdateProfileDTO(BaseModel):
     code: str
     full_name: str | None
     date_of_birth: datetime | None
-    gender: str | None
+    gender: Gender
     address: str | None
     position: str | None
     department: str | None

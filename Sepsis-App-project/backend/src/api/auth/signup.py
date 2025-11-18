@@ -9,6 +9,8 @@ from pydantic import (
     field_validator,
 )
 
+from .. import VIETNAM_PHONE_REGEX
+
 
 from ...repositories import (
     base,
@@ -16,15 +18,11 @@ from ...repositories import (
     profile as profile_repository,
 )
 
-from ...utils import jwt, employee_code
+from ...utils import jwt, code
 from ..response import Response
 
 
 from . import router
-
-VIETNAM_PHONE_REGEX = re.compile(
-    r"^0[1-9][0-9]{8,9}$"
-)
 
 
 # ---- Exceptions ----
@@ -139,16 +137,16 @@ def signupInternal(dto: SignUpDTO) -> None:
 
 def generateEmployeeCode() -> str:
     """Loop and generate until the code is not duplicated."""
-    code = employee_code.generateWithPrefix("EMP")
+    _code = code.generateWithPrefix("EMP", 7)
     code_existed = profile_repository.checkCode(
-        code
+        _code
     )
 
     while code_existed:
-        code = employee_code.generateWithPrefix(
+        _code = employee_code.generateWithPrefix(
             "EMP"
         )
         code_existed = (
-            profile_repository.checkCode(code)
+            profile_repository.checkCode(_code)
         )
     return code

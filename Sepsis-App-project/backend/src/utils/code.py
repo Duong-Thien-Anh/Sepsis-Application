@@ -15,5 +15,7 @@ def generate_random_string(length: int) -> str:
     return random_string
 
 
-def generateWithPrefix(prefix: str) -> str:
-    return prefix + generate_random_string(7)
+def generateWithPrefix(
+    prefix: str, length: int
+) -> str:
+    return prefix + generate_random_string(length)
