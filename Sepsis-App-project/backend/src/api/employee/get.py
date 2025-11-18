@@ -54,10 +54,40 @@ def me(
 
 
 def meInternal(usr: str) -> ProfileResponse:
-    profile_m = profile.get(usr)
+    profile_m = profile.get(usr, False)
     if profile_m is None:
         raise HTTPException(
             400, "The user profile not found!"
+        )
+    return ProfileResponse.model_validate(
+        profile_m
+    )
+
+
+@router.get(
+    "/{code}",
+    dependencies=[
+        Security(checkRole, scopes=["admin"])
+    ],
+)
+def getByEmployeeCode(
+    code: str,
+) -> Response[ProfileResponse]:
+    return Response(
+        http.HTTPStatus.OK,
+        getByEmployeeCodeInternal(code),
+        "Lấy hồ sơ thành công!",
+    )
+
+
+def getByEmployeeCodeInternal(
+    code: str,
+) -> ProfileResponse:
+    profile_m = profile.get(code, True)
+    if profile_m is None:
+        raise HTTPException(
+            400,
+            "Không tìm thấy hồ sơ người dùng!",
         )
     return ProfileResponse.model_validate(
         profile_m

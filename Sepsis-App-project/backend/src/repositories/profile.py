@@ -58,13 +58,27 @@ def checkCode(code: str) -> bool:
     )
 
 
-def get(usr: str) -> Profile:
-    return (
-        Profile.select()
-        .join(Account)
-        .where(Account.username == usr)
-        .first()
-    )
+def get(
+    usr_or_code: str, is_code: bool
+) -> Profile:
+    if not is_code:
+        return (
+            Profile.select()
+            .join(Account)
+            .where(
+                Account.username == usr_or_code
+            )
+            .first()
+        )
+    else:
+        return (
+            Profile.select()
+            .where(
+                Profile.employee_code
+                == usr_or_code
+            )
+            .first()
+        )
 
 
 def insertOne(
