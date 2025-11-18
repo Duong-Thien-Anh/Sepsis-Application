@@ -1,9 +1,12 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import Any
 from fastapi import HTTPException
 from peewee import (
     CharField,
     DateField,
     DecimalField,
+    Field,
     ForeignKeyField,
     TextField,
 )
@@ -22,8 +25,8 @@ class ProfileExisted(HTTPException):
         )
 
 
-class Employee(BaseModel):
-    code = CharField(primary_key=True)
+class Profile(BaseModel):
+    employee_code = CharField(primary_key=True)
     account_id = ForeignKeyField(
         Account, field=Account.id
     )
@@ -44,32 +47,32 @@ class Employee(BaseModel):
 
     class Meta:
         def table_function(_):
-            return "Employee"
+            return "Profile"
 
 
 def checkCode(code: str) -> bool:
     return (
-        Employee.select()
-        .where(Employee.code == code)
+        Profile.select()
+        .where(Profile.employee_code == code)
         .exists()
     )
 
 
-def get(usr: str) -> Employee:
+def get(usr: str) -> Profile:
     return (
-        Employee.select()
+        Profile.select()
         .join(Account)
         .where(Account.username == usr)
         .first()
     )
 
 
-async def insertOne(
+def insertOne(
     account_id: int,
     employee_code: str,
     full_name: str,
 ) -> None:
-    _, created = Employee.get_or_create(
+    _, created = Profile.get_or_create(
         account_id=account_id,
         defaults={
             "employee_code": employee_code,
@@ -80,3 +83,36 @@ async def insertOne(
     if not created:
         raise ProfileExisted()
     return
+
+
+def updateFields(
+    usr: str,
+    fields: Iterable[Field],
+    values: Iterable[Any],
+) -> None:
+    """
+    Update *only* the supplied fields.
+
+    # Example
+    ```python
+    updateFields(
+        (Profile.day_of_birth, Profile.position),
+        ("11/02/1999", "doctor")
+    )
+    ```
+    """
+    data: dict[Field, Any] = dict(
+        zip(fields, values)
+    )
+    data = {
+        field.name: value
+        for field, value in zip(fields, values)
+    }
+    Profile.update(**data).join(Account).where(
+        Account.username == usr
+    ).execute()
+    return
+
+
+def getAll() -> list[Profile]:
+    return Profile.select()
