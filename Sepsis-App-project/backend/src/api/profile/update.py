@@ -17,7 +17,6 @@ from . import router
 
 
 class UpdateProfileDTO(BaseModel):
-    code: str
     full_name: str | None
     date_of_birth: datetime | None
     gender: Gender
@@ -64,9 +63,6 @@ def updateInternal(
     values_to_update: list[Any] = []
 
     for attr, value in dto.model_dump().items():
-        if attr == "code":
-            continue
-
         if value is not None:
             try:
                 peewee_field: str = attr

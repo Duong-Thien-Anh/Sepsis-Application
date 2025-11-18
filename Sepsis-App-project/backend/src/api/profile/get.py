@@ -9,6 +9,8 @@ from fastapi import (
 )
 from pydantic import BaseModel
 
+from .. import Gender
+
 from ...utils.jwt import checkRole, getCurrentUser
 from ...repositories import profile
 from ..response import Response
@@ -21,7 +23,7 @@ class ProfileResponse(BaseModel):
     account_id: int
     full_name: str
     date_of_birth: datetime | None
-    gender: str | None
+    gender: Gender
     address: str | None
     position: str | None
     department: str | None
