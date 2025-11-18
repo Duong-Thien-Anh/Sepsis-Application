@@ -108,7 +108,7 @@ def verify(token: str) -> str:
     return usr
 
 
-async def checkRole(
+def checkRole(
     scopes: security.SecurityScopes,
     credentials: Annotated[
         security.HTTPAuthorizationCredentials,
@@ -116,11 +116,12 @@ async def checkRole(
     ],
 ) -> None:
     user = verify(credentials.credentials)
-    query = await account.getFields(
+    query = account.getFields(
         user,
         (account.Account.role),
         False,
     )
+
     if query is None:
         raise InvalidToken(
             "Your access token is invalid!"
