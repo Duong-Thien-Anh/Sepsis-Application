@@ -90,10 +90,10 @@ if environ.get("ENV", "DEV") == "PRODUCTION":
     "/signup",
     dependencies=dependencies,
 )
-async def signup(
+def signup(
     dto: SignUpDTO,
 ) -> Response[None]:
-    await signupInternal(dto)
+    signupInternal(dto)
     return Response(
         http.HTTPStatus.OK,
         None,
@@ -101,7 +101,7 @@ async def signup(
     )
 
 
-async def signupInternal(dto: SignUpDTO) -> None:
+def signupInternal(dto: SignUpDTO) -> None:
     hashed = bcrypt.hashpw(
         dto.password.encode("utf-8"),
         bcrypt.gensalt(
@@ -112,7 +112,7 @@ async def signupInternal(dto: SignUpDTO) -> None:
     )
 
     with base.db.atomic():
-        await account_repository.insertOne(
+        account_repository.insertOne(
             dto.username,
             hashed.decode("utf-8"),
             dto.email,
@@ -121,7 +121,7 @@ async def signupInternal(dto: SignUpDTO) -> None:
         )
 
         account_id = (
-            await account_repository.getFields(
+            account_repository.getFields(
                 dto.username,
                 (account_repository.Account.id),
                 False,
@@ -130,7 +130,7 @@ async def signupInternal(dto: SignUpDTO) -> None:
 
         employee_code = generateEmployeeCode()
 
-        await profile_repository.insertOne(
+        profile_repository.insertOne(
             account_id,
             employee_code,
             dto.full_name,

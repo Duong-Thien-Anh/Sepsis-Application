@@ -47,7 +47,7 @@ class Account(BaseModel):
             return "Account"
 
 
-async def insertOne(
+def insertOne(
     username: str,
     password_hash: str,
     email: str,
@@ -67,11 +67,11 @@ async def insertOne(
         raise UserExisted()
 
 
-async def getAll() -> list[Account]:
+def getAll() -> list[Account]:
     return list(Account.select())
 
 
-async def getFields(
+def getFields(
     username_or_email: str,
     fields: tuple[Any, ...],
     is_email: bool,
@@ -103,13 +103,13 @@ async def getFields(
         )
 
 
-async def updateFields(
+def updateFields(
     usr: str,
     fields: Iterable[Field],
     values: Iterable[Any],
 ) -> None:
     """
-    Update *only* the supplied fields on an existing Peewee instance.
+    Update *only* the supplied fields.
 
     # Example
     ```python

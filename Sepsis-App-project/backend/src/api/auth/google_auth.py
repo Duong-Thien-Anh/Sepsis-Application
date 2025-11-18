@@ -30,7 +30,7 @@ GOOGLE_REDIRECT_URL = (
 
 
 @router.post("/google/login")
-async def googleLogin():
+def googleLogin():
     params = {
         "response_type": "code",
         "client_id": GOOGLE_CLIENT_ID,
@@ -77,7 +77,7 @@ def getUserInfo(code: str):
 
 
 @router.get("/google/callback")
-async def googleCallback(
+def googleCallback(
     code: str = Query(...),
 ) -> Response[TokenPair]:
     if not code:
@@ -87,7 +87,7 @@ async def googleCallback(
         )
 
     user_info = getUserInfo(code)
-    user = await account.getFields(
+    user = account.getFields(
         user_info["email"],
         (account.Account.username),
         True,

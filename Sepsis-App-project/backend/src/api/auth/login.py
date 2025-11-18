@@ -46,12 +46,12 @@ class LoginDTO(BaseModel):
 
 
 @router.post("/login")
-async def login(
+def login(
     dto: LoginDTO,
     request: Request,
 ) -> Response[TokenPair]:
     host = request.client.host
-    await loginInternal(
+    loginInternal(
         dto.username, dto.password, host
     )
     return Response(
@@ -61,10 +61,10 @@ async def login(
     )
 
 
-async def loginInternal(
+def loginInternal(
     username: str, pwd: str, host: str
 ) -> None:
-    result = await account.getFields(
+    result = account.getFields(
         username,
         (account.Account.password_hash),
         False,
@@ -91,7 +91,7 @@ async def loginInternal(
             )
 
         # Update information each login time
-        await account.updateFields(
+        account.updateFields(
             username,
             (
                 account.Account.last_login,
