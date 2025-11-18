@@ -86,8 +86,8 @@ def insertOne(
 
 
 def updateFields(
-    usr: str,
-    fields: Iterable[Field],
+    code: str,
+    fields: Iterable[str],
     values: Iterable[Any],
 ) -> None:
     """
@@ -101,15 +101,15 @@ def updateFields(
     )
     ```
     """
-    data: dict[Field, Any] = dict(
+    data: dict[str, Any] = dict(
         zip(fields, values)
     )
     data = {
-        field.name: value
+        field: value
         for field, value in zip(fields, values)
     }
-    Profile.update(**data).join(Account).where(
-        Account.username == usr
+    Profile.update(**data).where(
+        Profile.employee_code == code
     ).execute()
     return
 
