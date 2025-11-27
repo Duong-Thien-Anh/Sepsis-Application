@@ -2,6 +2,7 @@ import requests
 from tkinter import messagebox
 from services.api.api_urls import API_ROUTES
 from dotenv import load_dotenv
+from services.api.patient_service import patient_service
 import time
 
 class PatientController:
@@ -15,9 +16,7 @@ class PatientController:
     # ==================== CRUD OPERATIONS ====================
     
     def get_all_patients(self):
-        """Lấy danh sách tất cả bệnh nhân từ API."""
         cache_key = "all_patients"
-        
         # Kiểm tra cache
         if cache_key in self._cache:
             cached_time, cached_data = self._cache[cache_key]
@@ -28,10 +27,17 @@ class PatientController:
         try:
             url = API_ROUTES["patient"]["list"]
             print(f"🌐 Đang gọi API: {url}")
-            response = requests.get(url, timeout=self.timeout)
+            headers = {}
+            if hasattr(self, 'access_token') and self.access_token:
+                headers['Authorization'] = f'Bearer {self.access_token}'
+
+            response = requests.get(url, headers=headers, timeout=self.timeout)
             response.raise_for_status()
             
             data = response.json()
+            if data.get("status") != 200:
+                print(f"⚠️ API trả về lỗi: {data.get('message')}")
+                return []
             patients = data.get("data", [])
             
             # Lưu vào cache
@@ -79,28 +85,27 @@ class PatientController:
             return None
     
     def create_patient(self, patient_data):
-        """Tạo bệnh nhân mới.
+        is_valid  , error_msg = self.validate_patient_data(patient_data)
+        if not is_valid:
+            print(f"❌ Dữ liệu không hợp lệ: {error_msg}")
+            return (False, error_msg, None)
         
-        Args:
-            patient_data (dict): Dữ liệu bệnh nhân
-                - full_name: Họ và tên
-                - birth_date: Ngày sinh (YYYY-MM-DD)
-                - gender: Giới tính (Nam/Nữ)
-                - phone: Số điện thoại
-                - email: Email
-                
-        Returns:
-            tuple: (success: bool, message: str, data: dict)
-        """
         try:
             url = API_ROUTES["patient"]["create"]
             print(f"🌐 Đang gọi API: {url}")
             print(f"📝 Dữ liệu: {patient_data}")
             
-            response = requests.post(url, json=patient_data, timeout=self.timeout)
+            header ={}
+            if hasattr(self, 'access_token') and self.access_token:
+                header['Authorization'] = f'Bearer {self.access_token}'
+            response = requests.post(url, json=patient_data, headers=header, timeout=self.timeout)
             response.raise_for_status()
             
             data = response.json()
+            if data.get("status") != 200:
+                error_msg = data.get("message", "Lỗi tạo bệnh nhân")
+                print(f"⚠️ API trả về lỗi: {error_msg}")
+                return (False, error_msg, None)
             
             # Xóa cache để reload danh sách
             self._clear_cache()

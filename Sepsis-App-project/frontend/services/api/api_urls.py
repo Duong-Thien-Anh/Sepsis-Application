@@ -11,7 +11,9 @@ API_ROUTES = {
     # -------------------------------
     "auth": {
         "login": f"{BASE_URL}/auth/login",
-        "register": f"{BASE_URL}/auth/register",
+        "signup": f"{BASE_URL}/auth/signup",
+        "google_login": f"{BASE_URL}/auth/google/login",
+        "google_callback": f"{BASE_URL}/auth/google/callback",
         "logout": f"{BASE_URL}/auth/logout",
         "refresh_token": f"{BASE_URL}/auth/refresh",
         "forgot_password": f"{BASE_URL}/auth/forgot-password",

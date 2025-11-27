@@ -1,26 +1,35 @@
-from .api_client import ApiClient
-from .api_urls import get_auth_urls
+from .api_client import APIClient
+from .api_urls import API_ROUTES
 
 class AuthService:
     def __init__(self):
-        self.client = ApiClient()  # client chung cho toàn hệ thống
-        self.urls = get_auth_urls()  # load nhóm endpoint Auth
+        self.auth_client = APIClient()
+        self.urls = API_ROUTES["auth"]
 
-    def login(self, username: str, password: str):
-        """Gọi API đăng nhập"""
-        payload = {"username": username, "password": password}
-        return self.client.post(self.urls["login"], json=payload)
+    def login(self ,username: str , passsword: str):
+        payload = {
+            "username": username,
+            "password": passsword
+        } 
 
-    def register(self, username: str, password: str, email: str):
-        """Gọi API đăng ký"""
-        payload = {"username": username, "password": password, "email": email}
-        return self.client.post(self.urls["register"], json=payload)
- 
+        response = self.client.post("/auth/login", json=payload)
+
+        if response.get("status") == 200:
+            token = response.get("data", {}).get("at")
+            if token:
+                self.client.set_token(token)
+            return "success", response.get("data")
+        else:
+            return "error", response.get("message", "Đăng nhập thất bại!")
+        
     def logout(self):
-        """Gọi API đăng xuất"""
-        return self.client.post(self.urls["logout"])
+        self.client.clear_token()
+        return "success", "Đã đăng xuất thành công."
+    
+    def google_login(self):
+        response = self.client.post("/auth/google/login")
+        return response
+    
+auth_service = AuthService()
 
-    def refresh_token(self, refresh_token: str):
-        """Lấy access token mới bằng refresh token"""
-        payload = {"refresh_token": refresh_token}
-        return self.client.post(self.urls["refresh_token"], json=payload)
+

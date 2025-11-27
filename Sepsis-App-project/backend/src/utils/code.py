@@ -19,3 +19,13 @@ def generateWithPrefix(
     prefix: str, length: int
 ) -> str:
     return prefix + generate_random_string(length)
+
+
+def generateEmployeeCodeWithDigits(
+    prefix: str, digit_length: int
+) -> str:
+    """Generate code with prefix + random digits only.
+    Example: generateEmployeeCodeWithDigits('EMP', 7) -> 'EMP1234567' (10 chars)
+    """
+    digits = ''.join(str(random.randint(0, 9)) for _ in range(digit_length))
+    return prefix + digits

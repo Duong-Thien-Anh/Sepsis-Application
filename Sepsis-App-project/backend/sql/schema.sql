@@ -1,11 +1,15 @@
 ﻿-- TODO: Viet Nam letters are still have some issues.
 DROP DATABASE IF EXISTS sepsis;
+
 CREATE DATABASE sepsis;
+
 USE sepsis;
 
 -- Enable to store Viet Nam letters
 SET NAMES utf8mb4;
+
 SET CHARACTER SET utf8mb4;
+
 SET collation_connection = utf8mb4_unicode_ci;
 
 -- ============= Account Table =============
@@ -17,7 +21,7 @@ CREATE TABLE Account (
     email VARCHAR(255),
     role ENUM('user', 'admin') DEFAULT 'user',
     status VARCHAR(50) DEFAULT 'inactive',
-    created_date DATE DEFAULT (CURRENT_DATE),
+    created_date DATE DEFAULT(CURRENT_DATE),
     last_login DATETIME,
     note TEXT,
     is_2fa_enabled TINYINT(1) DEFAULT 0,
@@ -27,7 +31,7 @@ CREATE TABLE Account (
 );
 
 -- ============= Profile Table =============
-CREATE TABLE Profile(
+CREATE TABLE Profile (
     employee_code CHAR(10) PRIMARY KEY,
     account_id INTEGER UNIQUE NOT NULL,
     full_name VARCHAR(255) NOT NULL,
@@ -37,17 +41,14 @@ CREATE TABLE Profile(
     position VARCHAR(100),
     department VARCHAR(100),
     start_date DATE,
-    salary DECIMAL(15,2),
+    salary DECIMAL(15, 2),
     education_level VARCHAR(100),
     license_number VARCHAR(100),
     emergency_contact_name VARCHAR(255),
     emergency_contact_relation VARCHAR(50),
     emergency_contact_phone VARCHAR(20),
     photo_path VARCHAR(255),
-
-    CONSTRAINT fk_id_account 
-        FOREIGN KEY (account_id) REFERENCES Account(id)
-        ON DELETE CASCADE
+    CONSTRAINT fk_id_account FOREIGN KEY (account_id) REFERENCES Account (id) ON DELETE CASCADE
 );
 
 -- ============= Patient Table =============
@@ -61,7 +62,7 @@ CREATE TABLE Patient (
     address TEXT,
     blood_type VARCHAR(10),
     height_cm INT,
-    weight_kg DECIMAL(5,2),
+    weight_kg DECIMAL(5, 2),
     medical_history TEXT,
     emergency_contact_name VARCHAR(255),
     emergency_contact_relation VARCHAR(50),
@@ -78,9 +79,9 @@ CREATE TABLE MedicalHistoryRecord (
     record_type VARCHAR(100),
     description TEXT,
     patient_code VARCHAR(20) NOT NULL,
-    employee_code CHAR(20) NOT NULL,
-    FOREIGN KEY (patient_code) REFERENCES Patient(code) ON DELETE CASCADE,
-    FOREIGN KEY (employee_code) REFERENCES Profile(employee_code) ON DELETE RESTRICT
+    employee_code CHAR(10) NOT NULL,
+    FOREIGN KEY (patient_code) REFERENCES Patient (code) ON DELETE CASCADE,
+    FOREIGN KEY (employee_code) REFERENCES Profile (employee_code) ON DELETE RESTRICT
 );
 
 -- ============= Diagnosis =============
@@ -92,7 +93,7 @@ CREATE TABLE Diagnosis (
     diagnosis_name VARCHAR(255),
     note TEXT,
     record_id VARCHAR(20) NOT NULL,
-    FOREIGN KEY (record_id) REFERENCES MedicalHistoryRecord(record_id) ON DELETE CASCADE
+    FOREIGN KEY (record_id) REFERENCES MedicalHistoryRecord (record_id) ON DELETE CASCADE
 );
 
 -- ============= TestResult =============
@@ -106,20 +107,20 @@ CREATE TABLE TestResult (
     file_path VARCHAR(255),
     note TEXT,
     record_id VARCHAR(20) NOT NULL,
-    FOREIGN KEY (record_id) REFERENCES MedicalHistoryRecord(record_id) ON DELETE CASCADE
+    FOREIGN KEY (record_id) REFERENCES MedicalHistoryRecord (record_id) ON DELETE CASCADE
 );
 
 -- ============= AIResult =============
 CREATE TABLE AIResult (
     ai_result_id VARCHAR(20) PRIMARY KEY,
     prediction_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    risk_score DECIMAL(5,2),
-    sepsis_probability DECIMAL(5,2),
+    risk_score DECIMAL(5, 2),
+    sepsis_probability DECIMAL(5, 2),
     suggested_treatment TEXT,
     ai_evaluation_result VARCHAR(255),
     ai_model_explanation TEXT,
     diagnosis_id VARCHAR(20) UNIQUE NOT NULL,
-    FOREIGN KEY (diagnosis_id) REFERENCES Diagnosis(diagnosis_id) ON DELETE CASCADE
+    FOREIGN KEY (diagnosis_id) REFERENCES Diagnosis (diagnosis_id) ON DELETE CASCADE
 );
 
 -- ============= RecallAppointment =============
@@ -130,9 +131,9 @@ CREATE TABLE RecallAppointment (
     email_status VARCHAR(50),
     note TEXT,
     patient_code VARCHAR(20) NOT NULL,
-    employee_code CHAR(20) NOT NULL,
-    FOREIGN KEY (patient_code) REFERENCES Patient(code) ON DELETE CASCADE,
-    FOREIGN KEY (employee_code) REFERENCES Profile(employee_code) ON DELETE RESTRICT
+    employee_code CHAR(10) NOT NULL,
+    FOREIGN KEY (patient_code) REFERENCES Patient (code) ON DELETE CASCADE,
+    FOREIGN KEY (employee_code) REFERENCES Profile (employee_code) ON DELETE RESTRICT
 );
 
 -- ============= ActivityLog =============
@@ -145,7 +146,7 @@ CREATE TABLE ActivityLog (
     affected_object_type VARCHAR(100),
     affected_object_id VARCHAR(20),
     account_id INTEGER NOT NULL,
-    FOREIGN KEY (account_id) REFERENCES Account(id) ON DELETE CASCADE
+    FOREIGN KEY (account_id) REFERENCES Account (id) ON DELETE CASCADE
 );
 
 -- =============================================
@@ -153,17 +154,17 @@ CREATE TABLE ActivityLog (
 -- =============================================
 
 -- Email format
-ALTER TABLE Account 
-ADD CONSTRAINT chk_EmailFormat 
-CHECK (email REGEXP '^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$');
+ALTER TABLE Account
+ADD CONSTRAINT chk_EmailFormat CHECK (
+    email REGEXP '^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$'
+);
 
 -- Phone: only digits, 9-11 chars, start with 0
 ALTER TABLE Account
-ADD CONSTRAINT chk_PhoneFormat 
-CHECK (phone REGEXP '^0[0-9]{8,10}$');
+ADD CONSTRAINT chk_PhoneFormat CHECK (phone REGEXP '^0[0-9]{8,10}$');
 
 -- Same for Patient
-ALTER TABLE Patient 
+ALTER TABLE Patient
 ADD CONSTRAINT chk_patient_phone CHECK (phone REGEXP '^0[0-9]{8,10}$');
 
 -- =============================================

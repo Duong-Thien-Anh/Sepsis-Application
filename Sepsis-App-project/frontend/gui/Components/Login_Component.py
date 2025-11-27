@@ -142,7 +142,9 @@ class LoginFormUI(ctk.CTkFrame):
 
         # 3. Gọi Controller để xử lý logic nghiệp vụ (chỉ API, không GUI)
         try:
+            print(f"🔍 DEBUG - Username: '{username}', Password: '{password}'")
             status, data = self.Login_Ctrl.login1(username, password)
+            print(f"🔍 DEBUG - Status: {status}, Data: {data}")
         except Exception as e:
             tk.messagebox.showerror("Lỗi", f"Lỗi khi gọi hàm đăng nhập: {e}")
             return

@@ -7,7 +7,7 @@ def load_environment():
     """
     load_dotenv()
     return {
-        "API_URL": os.getenv("API_URL", "http://localhost:8000"),
+        "API_URL": os.getenv("API_URL", "http://localhost:5000"),
         "API_KEY": os.getenv("API_KEY", ""),
         "TIMEOUT": int(os.getenv("TIMEOUT", "10"))
     }

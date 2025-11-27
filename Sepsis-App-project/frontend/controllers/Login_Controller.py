@@ -4,7 +4,7 @@ import tkinter as tk
 import requests
 import re 
 from dotenv import load_dotenv
-
+from services.api.auth_service import auth_service
 
 class LoginController():
     def __init__(self, api_url=None, timeout=5):
@@ -45,8 +45,27 @@ class LoginController():
                 entry.insert(0, placeholder)
                 entry.configure(text_color="grey")
         
+        # Enable Ctrl+V paste
+        def on_paste(event):
+            try:
+                clipboard_text = entry.clipboard_get()
+                # Xóa placeholder nếu có
+                if entry.get() == placeholder:
+                    entry.delete(0, ctk.END)
+                    entry.configure(text_color="black")
+                # Chỉ paste tối đa 30 ký tự
+                if len(clipboard_text) <= 30:
+                    entry.insert(tk.INSERT, clipboard_text)
+                else:
+                    entry.insert(tk.INSERT, clipboard_text[:30])
+                return "break"  # Ngăn default paste behavior
+            except:
+                pass
+        
         entry.bind("<FocusIn>", on_focus_in)
         entry.bind("<FocusOut>", on_focus_out)
+        entry.bind("<Control-v>", on_paste)  # Windows/Linux
+        entry.bind("<Command-v>", on_paste)  # macOS
 
     # ========== LIMIT PASSWORD LENGTH ==========
     def validate_password_input(self, text):
@@ -102,8 +121,27 @@ class LoginController():
                 entry.insert(0, placeholder)
                 entry.configure(text_color="grey", show="")
 
+        # Enable Ctrl+V paste for password
+        def on_paste(event):
+            try:
+                clipboard_text = entry.clipboard_get()
+                # Xóa placeholder nếu có
+                if entry.get() == placeholder:
+                    entry.delete(0, ctk.END)
+                    entry.configure(text_color="black", show="*")
+                # Chỉ paste tối đa 30 ký tự
+                if len(clipboard_text) <= 30:
+                    entry.insert(tk.INSERT, clipboard_text)
+                else:
+                    entry.insert(tk.INSERT, clipboard_text[:30])
+                return "break"  # Ngăn default paste behavior
+            except:
+                pass
+
         entry.bind("<FocusIn>", on_focus_in)
-        entry.bind("<FocusOut>", on_focus_out)   
+        entry.bind("<FocusOut>", on_focus_out)
+        entry.bind("<Control-v>", on_paste)  # Windows/Linux
+        entry.bind("<Command-v>", on_paste)  # macOS   
 
     # ========== HOVER LABEL ==========
     def hover_effect_label_forget_password(self, label):
@@ -116,22 +154,8 @@ class LoginController():
         label.bind("<Enter>", on_enter)
         label.bind("<Leave>", on_leave)
 
-    # ========== HANDLE SIGN IN BUTTON CLICK ==========
     # ========== login_API ==========
     def login1(self, username, password):
-        """
-        Controller xử lý logic nghiệp vụ đăng nhập (GỌI API).
-        Không xử lý GUI, chỉ trả về kết quả để View tự quyết định hiển thị.
-        
-        Args:
-            username (str): Tên đăng nhập
-            password (str): Mật khẩu
-            
-        Returns:
-            tuple: (status, data)
-                - status: "success" hoặc "error"
-                - data: dict chứa thông tin user (nếu thành công) hoặc message lỗi (nếu thất bại)
-        """
         # 1. Validate input ở Controller layer (business logic)
         if not username or not password:
             return "error", "Thiếu thông tin đăng nhập"
@@ -141,12 +165,14 @@ class LoginController():
             url = f"{self.api_url}/auth/login"
             payload = {"username": username, "password": password}
             response = requests.post(url, json=payload, timeout=self.timeout)
-
             data = response.json()
-            print("Response from login API:", data)
-
-            # 3. Xử lý response và trả về kết quả (KHÔNG hiển thị messagebox)
-            if response.status_code == 200 and data.get("success") == True:
+            
+            # 3. Xử lý response từ backend (format: {status, data, message})
+            if response.status_code == 200 and data.get("status") == 200:
+                # Lưu token nếu cần
+                if "data" in data and "access_token" in data["data"]:
+                    # TODO: Lưu token vào session/storage
+                    pass
                 return "success", data
             else:
                 error_message = data.get('message', 'Sai thông tin đăng nhập')

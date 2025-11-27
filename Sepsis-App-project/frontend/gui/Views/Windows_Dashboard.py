@@ -26,9 +26,9 @@ class Windows_DB(ctk.CTk):
         self.dashboard_component = None
         
         # Hiển thị màn hình đăng nhập đầu tiên
-        # self.show_signin()
+        self.show_signin()
         """Mặc định hiển thị Dashboard để tiện phát triển."""
-        self.show_dashboard() 
+        # self.show_dashboard() 
 
     def show_signin(self):
         """Hiển thị màn hình đăng nhập (SignInComponent)."""

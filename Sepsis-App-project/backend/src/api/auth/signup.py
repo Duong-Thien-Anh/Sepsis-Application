@@ -137,16 +137,13 @@ def signupInternal(dto: SignUpDTO) -> None:
 
 def generateEmployeeCode() -> str:
     """Loop and generate until the code is not duplicated."""
-    _code = code.generateWithPrefix("EMP", 7)
+    _code = code.generateEmployeeCodeWithDigits("EMP", 7)
     code_existed = profile_repository.checkCode(
         _code
     )
 
     while code_existed:
-        _code = employee_code.generateWithPrefix(
-            "EMP"
-        )
-        code_existed = (
-            profile_repository.checkCode(_code)
-        )
-    return code
+        _code = code.generateEmployeeCodeWithDigits("EMP", 7)  
+        code_existed = profile_repository.checkCode(_code)
+
+    return _code
